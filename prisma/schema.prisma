@@ -1,0 +1,133 @@
+// Karen Adventures — PostgreSQL schema
+// Premium Kenyan travel, adventure & curated experiences.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// A curated journey / safari / adventure offered by Karen Adventures.
+model Adventure {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  tagline       String
+  description   String
+  image         String
+  imageAlt      String
+  duration      String
+  startingPrice Int // USD, per person
+  location      String
+  region        String
+  tripType      String // Safari | Adventure | Coastal | Cultural | Luxury | Expedition
+  bestSeason    String?
+  groupSize     String?
+  featured      Boolean  @default(false)
+  highlights    String[]
+  createdAt     DateTime @default(now())
+
+  featuredIn Destination[] @relation("DestinationTrips")
+
+  @@index([featured])
+  @@index([tripType])
+}
+
+/// A Kenyan destination on the Explorer map.
+model Destination {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  region          String
+  description     String
+  image           String
+  imageAlt        String
+  latitude        Float
+  longitude       Float
+  bestExperiences String[]
+  recommendedTrips Adventure[] @relation("DestinationTrips")
+  createdAt       DateTime @default(now())
+}
+
+/// A signature experience category (Private, Group, Luxury, etc.).
+model Experience {
+  id          String @id @default(cuid())
+  slug        String @unique
+  title       String
+  description String
+  icon        String // lucide icon name
+  order       Int    @default(0)
+}
+
+/// Guest stories.
+model Testimonial {
+  id       String @id @default(cuid())
+  name     String
+  location String
+  tripType String
+  quote    String
+  rating   Int    @default(5)
+}
+
+/// Editorial gallery imagery.
+model GalleryItem {
+  id       String @id @default(cuid())
+  image    String
+  alt      String
+  category String // Safari | Landscape | Coast | Culture | Escape
+  width    Int
+  height   Int
+  order    Int    @default(0)
+}
+
+/// Booking & planning inquiries from the contact form.
+model Inquiry {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  destination String?
+  tripType    String?
+  travelers   String?
+  travelDate  String?
+  message     String
+  status      String   @default("new") // new | planned | confirmed | archived
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+/// A reserved journey — created by guests via the public booking flow.
+model Booking {
+  id             String    @id @default(cuid())
+  reference      String    @unique
+  name           String
+  email          String
+  phone          String?
+  adventureSlug  String?
+  adventureTitle String
+  destination    String?
+  travelers      Int
+  startDate      DateTime?
+  priceEstimate  Int
+  status         String    @default("pending") // pending | confirmed | completed | cancelled
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+/// Newsletter subscribers from the footer.
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
