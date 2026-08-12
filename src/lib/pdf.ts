@@ -76,6 +76,7 @@ async function fetchImageBuffer(url: string): Promise<Buffer | null> {
  *   totals · footer. Every asset is best-effort — missing logo/images degrade
  *   gracefully to a clean text layout.
  */
+export async function buildBookingPdf(b: BookingPdfSource): Promise<Buffer> {
   const primaryName = b.destinations[0] ?? b.destination ?? "";
   const [adventure, destination] = await Promise.all([
     b.adventureSlug

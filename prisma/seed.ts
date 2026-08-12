@@ -1666,8 +1666,8 @@ async function main() {
 
   // Seed when the curated destination set isn't fully present. This lets the
   // Vercel build populate a fresh production DB (or fill in any missing seeded
-  // locations after manual adds/deletes) while preserving admin edits on
-  // already-seeded rows. Force a full re-seed with:
+  // locations after manual adds/deletes). Fully-seeded DBs are left untouched,
+  // so admin edits on seeded rows survive redeploys. Force a full re-seed with:
   //   SEED_FORCE=true npx prisma db seed
   const seedSlugs = destinations.map((d) => d.slug);
   const present = await prisma.destination.count({
