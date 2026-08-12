@@ -28,7 +28,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  let event: { event?: string; data?: { reference?: string } };
+  let event: {
+    event?: string;
+    data?: { reference?: string; amount?: number; currency?: string };
+  };
   try {
     event = JSON.parse(raw);
   } catch {
@@ -36,12 +39,20 @@ export async function POST(req: Request) {
   }
 
   if (event.event === "charge.success" && event.data?.reference) {
+    // Record the deposit actually paid (Paystack amount is in the smallest unit).
+    const depositPaidKes =
+      event.data.currency === "KES" && typeof event.data.amount === "number"
+        ? Math.round(event.data.amount / 100)
+        : undefined;
     // Confirm the booking, then email the guest their branded confirmation PDF.
     // The status filter keeps this idempotent — a webhook retry (or a race with
     // the success page) won't re-confirm or re-email an already-confirmed booking.
     const updated = await prisma.booking.updateMany({
       where: { reference: event.data.reference, status: { not: "confirmed" } },
-      data: { status: "confirmed" },
+      data: {
+        status: "confirmed",
+        ...(depositPaidKes !== undefined ? { depositPaidKes } : {}),
+      },
     });
     if (updated.count > 0) {
       const booking = await prisma.booking.findUnique({

@@ -28,6 +28,11 @@ model Adventure {
   groupSize     String?
   featured      Boolean  @default(false)
   highlights    String[]
+  itinerary     Json? // day-by-day: [{ day, title, description }]
+  inclusions    String[] @default([])
+  exclusions    String[] @default([])
+  accommodation String?
+  transport     String?
   createdAt     DateTime @default(now())
 
   featuredIn Destination[] @relation("DestinationTrips")
@@ -48,6 +53,7 @@ model Destination {
   latitude        Float
   longitude       Float
   bestExperiences String[]
+  images          String[] @default([]) // gallery (first entry = hero)
   recommendedTrips Adventure[] @relation("DestinationTrips")
   createdAt       DateTime @default(now())
 }
@@ -115,7 +121,17 @@ model Booking {
   destination    String?
   destinations   String[]  @default([]) // all locations a guest wants to visit
   travelers      Int
+  adults         Int       @default(1)
+  children       Int       @default(0)
   startDate      DateTime?
+  endDate        DateTime?
+  pickupLocation String?
+  pickupTime     String?
+  dropoffLocation String?
+  dropoffTime    String?
+  accommodation  String?
+  transport      String?
+  depositPaidKes Int? // deposit actually received via Paystack (KES)
   priceEstimate  Int
   status         String    @default("pending") // pending | confirmed | completed | cancelled
   notes          String?

@@ -14,6 +14,14 @@ const parseList = (v: unknown) =>
     .filter(Boolean)
     .slice(0, 12);
 
+/** Image list (one per line, Unsplash IDs) — keeps the first as the hero. */
+const parseImages = (v: unknown) =>
+  (typeof v === "string" ? v : "")
+    .split("\n")
+    .map((x) => x.trim())
+    .filter(Boolean)
+    .slice(0, 8);
+
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -59,6 +67,12 @@ export async function PATCH(
   }
   if (b.image !== undefined) data.image = clean(b.image, 200);
   if (b.imageAlt !== undefined) data.imageAlt = clean(b.imageAlt, 200);
+  if (b.images !== undefined) {
+    const images = parseImages(b.images);
+    data.images = images;
+    // The first gallery image is the hero — keep image in sync when provided.
+    if (images.length) data.image = images[0];
+  }
 
   if (b.latitude !== undefined || b.longitude !== undefined) {
     const lat = b.latitude !== undefined ? Number(b.latitude) : null;

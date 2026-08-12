@@ -26,6 +26,7 @@ export default async function AdminDestinationsPage() {
     description: d.description,
     image: d.image,
     imageAlt: d.imageAlt,
+    images: d.images,
     latitude: d.latitude,
     longitude: d.longitude,
     bestExperiences: d.bestExperiences,

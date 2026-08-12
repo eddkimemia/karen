@@ -114,10 +114,10 @@ export default async function BookingSuccessPage({
         paidKes = v.data.amount / 100;
         // Idempotent confirm — a webhook may have confirmed first (or a refresh
         // re-run this page); never re-confirm or re-email an already-confirmed
-        // booking.
+        // booking. Also record the deposit paid in KES (Paystack returns cents).
         const updated = await prisma.booking.updateMany({
           where: { id: booking.id, status: { not: "confirmed" } },
-          data: { status: "confirmed" },
+          data: { status: "confirmed", depositPaidKes: Math.round((v.data?.amount ?? 0) / 100) },
         });
         if (updated.count > 0) {
           // Email the guest their confirmation (never blocks the page).
@@ -181,8 +181,30 @@ export default async function BookingSuccessPage({
             {booking.destinations.length > 0 && (
               <ReceiptRow icon={Users} label="Destinations" value={booking.destinations.join(" · ")} />
             )}
-            <ReceiptRow icon={Users} label="Travelers" value={`${booking.travelers} guest${booking.travelers === 1 ? "" : "s"}`} />
-            <ReceiptRow icon={Clock} label="Start date" value={fmtDate(booking.startDate)} />
+            <ReceiptRow
+              icon={Users}
+              label="Travelers"
+              value={`${booking.travelers} total · ${booking.adults} adult${booking.adults === 1 ? "" : "s"}${booking.children ? `, ${booking.children} child${booking.children === 1 ? "" : "ren"}` : ""}`}
+            />
+            <ReceiptRow
+              icon={Clock}
+              label="Dates"
+              value={
+                booking.endDate
+                  ? `${fmtDate(booking.startDate)} — ${fmtDate(booking.endDate)}`
+                  : fmtDate(booking.startDate)
+              }
+            />
+            {(booking.pickupLocation || booking.dropoffLocation) && (
+              <ReceiptRow
+                icon={CalendarDays}
+                label="Pick-up / drop-off"
+                value={[
+                  [booking.pickupLocation, booking.pickupTime].filter(Boolean).join(" · "),
+                  [booking.dropoffLocation, booking.dropoffTime].filter(Boolean).join(" · "),
+                ].filter(Boolean).join("  →  ")}
+              />
+            )}
             <ReceiptRow
               icon={Wallet}
               label="Estimated total"

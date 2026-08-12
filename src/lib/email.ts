@@ -25,7 +25,17 @@ type BookingLike = {
   destination: string | null;
   destinations?: string[];
   travelers: number;
+  adults?: number | null;
+  children?: number | null;
   startDate: Date | null;
+  endDate?: Date | null;
+  pickupLocation?: string | null;
+  pickupTime?: string | null;
+  dropoffLocation?: string | null;
+  dropoffTime?: string | null;
+  accommodation?: string | null;
+  transport?: string | null;
+  depositPaidKes?: number | null;
   priceEstimate: number;
   status: string;
   notes: string | null;
@@ -255,7 +265,17 @@ export async function sendBookingConfirmation(b: BookingLike) {
       email: b.email,
       phone: b.phone,
       travelers: b.travelers,
+      adults: b.adults ?? null,
+      children: b.children ?? null,
       startDate: b.startDate,
+      endDate: b.endDate ?? null,
+      pickupLocation: b.pickupLocation ?? null,
+      pickupTime: b.pickupTime ?? null,
+      dropoffLocation: b.dropoffLocation ?? null,
+      dropoffTime: b.dropoffTime ?? null,
+      accommodation: b.accommodation ?? null,
+      transport: b.transport ?? null,
+      depositPaidKes: b.depositPaidKes ?? null,
       priceEstimate: b.priceEstimate,
       status: b.status,
       notes: b.notes,
@@ -319,7 +339,17 @@ export async function notifyTeamBookingPaid(b: BookingLike) {
       email: b.email,
       phone: b.phone,
       travelers: b.travelers,
+      adults: b.adults ?? null,
+      children: b.children ?? null,
       startDate: b.startDate,
+      endDate: b.endDate ?? null,
+      pickupLocation: b.pickupLocation ?? null,
+      pickupTime: b.pickupTime ?? null,
+      dropoffLocation: b.dropoffLocation ?? null,
+      dropoffTime: b.dropoffTime ?? null,
+      accommodation: b.accommodation ?? null,
+      transport: b.transport ?? null,
+      depositPaidKes: b.depositPaidKes ?? null,
       priceEstimate: b.priceEstimate,
       status: b.status,
       notes: b.notes,

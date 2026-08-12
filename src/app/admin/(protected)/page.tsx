@@ -15,6 +15,7 @@ import {
   StatCard,
   StatusPill,
 } from "@/components/admin/ui";
+import { SeedButton } from "@/components/admin/seed-button";
 import { formatPrice } from "@/lib/utils";
 
 const fmtDate = (d: Date) =>
@@ -54,6 +55,19 @@ export default async function AdminDashboardPage() {
         title="Dashboard"
         description="A live overview of enquiries, reservations and subscribers."
       />
+
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded border border-ivory/10 bg-royal-deep/40 px-5 py-4">
+        <div>
+          <p className="text-[0.6875rem] font-medium uppercase tracking-[0.2em] text-gold/80">
+            Starter content
+          </p>
+          <p className="mt-1 text-xs text-ivory/50">
+            Populate journeys, destinations and experiences — useful on a fresh
+            deployment where the catalog is empty.
+          </p>
+        </div>
+        <SeedButton />
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard

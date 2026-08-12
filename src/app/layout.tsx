@@ -48,10 +48,10 @@ export const metadata: Metadata = {
       "Curated adventures, unforgettable escapes, and extraordinary experiences across Kenya.",
     images: [
       {
-        url: "/og.jpg",
-        width: 1600,
-        height: 900,
-        alt: "Kenya — elephants beneath Kilimanjaro at dusk",
+        url: "/images/karenimg.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Karen Adventures — Kenya, beyond the ordinary",
       },
     ],
   },
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     title: "Karen Adventures — Discover Kenya. Beyond the Ordinary.",
     description:
       "Curated adventures, unforgettable escapes, and extraordinary experiences across Kenya.",
-    images: ["/og.jpg"],
+    images: ["/images/karenimg.jpg"],
   },
   icons: {
     icon: [

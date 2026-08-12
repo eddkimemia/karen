@@ -16,7 +16,17 @@ export type BookingRow = {
   destination: string | null;
   destinations: string[];
   travelers: number;
+  adults: number;
+  children: number;
   startDate: string | null;
+  endDate: string | null;
+  pickupLocation: string | null;
+  pickupTime: string | null;
+  dropoffLocation: string | null;
+  dropoffTime: string | null;
+  accommodation: string | null;
+  transport: string | null;
+  depositPaidKes: number | null;
   priceEstimate: number;
   status: string;
   notes: string | null;
@@ -187,8 +197,27 @@ export function BookingsTable({
                 ? b.destinations.join(", ")
                 : (b.destination ?? "—")}
             </Field>
-            <Field label="Travelers">{b.travelers}</Field>
-            <Field label="Start date">{fmtDate(b.startDate)}</Field>
+            <Field label="Travelers">
+              {b.travelers} total · {b.adults} adult{b.adults === 1 ? "" : "s"}
+              {b.children ? `, ${b.children} child${b.children === 1 ? "" : "ren"}` : ""}
+            </Field>
+            <Field label="Dates">
+              {b.endDate ? `${fmtDate(b.startDate)} — ${fmtDate(b.endDate)}` : fmtDate(b.startDate)}
+            </Field>
+            <Field label="Pick-up / drop-off">
+              {[b.pickupLocation, b.pickupTime].filter(Boolean).join(" · ") ||
+                [b.dropoffLocation, b.dropoffTime].filter(Boolean).join(" · ") ||
+                "—"}
+            </Field>
+            <Field label="Accommodation">{b.accommodation ?? "—"}</Field>
+            <Field label="Transport">{b.transport ?? "—"}</Field>
+            <Field label="Deposit (KES)">
+              {b.depositPaidKes && b.depositPaidKes > 0
+                ? `Paid — ${b.depositPaidKes.toLocaleString("en-KE")}`
+                : b.status === "confirmed" || b.status === "completed"
+                  ? "Paid (webhook)"
+                  : "Awaiting"}
+            </Field>
             <Field label="Estimate (USD)">{formatPrice(b.priceEstimate)}</Field>
             <Field label="Estimate (KES)">
               KES {Math.round(b.priceEstimate * usdToKesRate).toLocaleString("en-KE")}

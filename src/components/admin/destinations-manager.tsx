@@ -22,6 +22,7 @@ export type DestinationRow = {
   description: string;
   image: string;
   imageAlt: string;
+  images: string[];
   latitude: number;
   longitude: number;
   bestExperiences: string[];
@@ -43,6 +44,7 @@ type FormState = {
   description: string;
   image: string;
   imageAlt: string;
+  images: string;
   latitude: string;
   longitude: string;
   bestExperiences: string;
@@ -56,6 +58,7 @@ const emptyForm = (): FormState => ({
   description: "",
   image: "",
   imageAlt: "",
+  images: "",
   latitude: "",
   longitude: "",
   bestExperiences: "",
@@ -69,6 +72,7 @@ const toForm = (d: DestinationRow): FormState => ({
   description: d.description,
   image: d.image,
   imageAlt: d.imageAlt,
+  images: (d.images.length ? d.images : [d.image]).join("\n"),
   latitude: String(d.latitude),
   longitude: String(d.longitude),
   bestExperiences: d.bestExperiences.join("\n"),
@@ -126,6 +130,7 @@ export function DestinationsManager({
           latitude: Number(form.latitude),
           longitude: Number(form.longitude),
           bestExperiences: form.bestExperiences,
+          images: form.images,
           trips: form.trips.join("\n"),
         }),
       });
@@ -350,25 +355,41 @@ export function DestinationsManager({
                 />
               </div>
 
-              <div>
-                <label className={labelClass} htmlFor="d-image">
-                  Image (Unsplash photo ID)
+              <div className="sm:col-span-2">
+                <label className={labelClass} htmlFor="d-images">
+                  Images (Unsplash photo IDs — one per line, first is the hero)
                 </label>
-                <input
-                  id="d-image"
-                  className={inputClass}
-                  value={form.image}
-                  onChange={(e) => set("image", e.target.value)}
-                  placeholder="e.g. 1547471080-7cc2caa01a7e"
+                <textarea
+                  id="d-images"
+                  className={`${inputClass} resize-y font-mono`}
+                  rows={4}
+                  value={form.images}
+                  onChange={(e) => set("images", e.target.value)}
+                  placeholder={"1547471080-7cc2caa01a7e\n1516426122078-c23e76319801\n…"}
                 />
-                {form.image && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={img(form.image, 400, 60)}
-                    alt=""
-                    className="mt-3 aspect-video w-full object-cover"
-                  />
+                {form.images.trim() && (
+                  <div className="mt-3 grid grid-cols-3 gap-2">
+                    {form.images
+                      .split("\n")
+                      .map((id) => id.trim())
+                      .filter(Boolean)
+                      .slice(0, 6)
+                      .map((id, i) => (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          key={`${id}-${i}`}
+                          src={img(id, 400, 60)}
+                          alt={`Destination image ${i + 1}`}
+                          className={`aspect-video w-full object-cover ${
+                            i === 0 ? "ring-2 ring-gold" : ""
+                          }`}
+                        />
+                      ))}
+                  </div>
                 )}
+                <p className="mt-2 text-[0.625rem] text-ivory/40">
+                  The first image is used as the card &amp; invoice hero photo.
+                </p>
               </div>
 
               <div>

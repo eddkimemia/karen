@@ -21,6 +21,14 @@ const parseList = (v: unknown) =>
     .filter(Boolean)
     .slice(0, 12);
 
+/** Image list (one per line, Unsplash IDs) — keeps the first as the hero. */
+const parseImages = (v: unknown) =>
+  (typeof v === "string" ? v : "")
+    .split("\n")
+    .map((x) => x.trim())
+    .filter(Boolean)
+    .slice(0, 8);
+
 function validLatLng(body: Record<string, unknown>) {
   const lat = Number(body.latitude);
   const lon = Number(body.longitude);
@@ -81,6 +89,8 @@ export async function POST(req: Request) {
 
   const slug = slugify(clean(b.slug, 160)) || slugify(name);
   const bestExperiences = parseList(b.bestExperiences);
+  const images = parseImages(b.images ?? b.image);
+  const gallery = images.length ? images : [image].filter(Boolean);
 
   // Link recommended trips by adventure slug (best-effort).
   const tripSlugs = parseList(b.trips).slice(0, 8);
@@ -98,8 +108,9 @@ export async function POST(req: Request) {
         name,
         region,
         description,
-        image,
+        image: gallery[0] ?? image,
         imageAlt,
+        images: gallery,
         latitude: coords.lat,
         longitude: coords.lon,
         bestExperiences,

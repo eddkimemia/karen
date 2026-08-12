@@ -40,7 +40,20 @@ export async function POST(req: Request) {
     .slice(0, 8);
   const notes = clean(b.notes).slice(0, 2000) || null;
   const startDateRaw = clean(b.startDate).slice(0, 20);
-  const travelers = Number(b.travelers);
+  const endDateRaw = clean(b.endDate).slice(0, 20);
+  const adults = Number(b.adults);
+  const children = Number(b.children);
+  // Travelers total — honour an explicit travelers count, else adults + children.
+  const travelers =
+    Number.isInteger(Number(b.travelers)) && Number(b.travelers) > 0
+      ? Number(b.travelers)
+      : Math.max(1, (Number.isInteger(adults) ? adults : 1) + (Number.isInteger(children) ? children : 0));
+  const pickupLocation = clean(b.pickupLocation).slice(0, 160) || null;
+  const pickupTime = clean(b.pickupTime).slice(0, 20) || null;
+  const dropoffLocation = clean(b.dropoffLocation).slice(0, 160) || null;
+  const dropoffTime = clean(b.dropoffTime).slice(0, 20) || null;
+  const accommodation = clean(b.accommodation).slice(0, 120) || null;
+  const transport = clean(b.transport).slice(0, 120) || null;
 
   if (name.length < 2) {
     return NextResponse.json({ error: "Please tell us your name." }, { status: 400 });
@@ -61,6 +74,19 @@ export async function POST(req: Request) {
   if (startDateRaw && Number.isNaN(startDate?.getTime())) {
     return NextResponse.json(
       { error: "Please choose a valid start date." },
+      { status: 400 },
+    );
+  }
+  const endDate = endDateRaw ? new Date(`${endDateRaw}T00:00:00Z`) : null;
+  if (endDateRaw && Number.isNaN(endDate?.getTime())) {
+    return NextResponse.json(
+      { error: "Please choose a valid end date." },
+      { status: 400 },
+    );
+  }
+  if (startDate && endDate && endDate < startDate) {
+    return NextResponse.json(
+      { error: "The end date must be after the start date." },
       { status: 400 },
     );
   }
@@ -101,7 +127,16 @@ export async function POST(req: Request) {
     destination: primaryDestination ?? null,
     destinations: destinationList,
     travelers,
+    adults: Number.isInteger(adults) && adults > 0 ? adults : travelers,
+    children: Number.isInteger(children) && children >= 0 ? children : 0,
     startDate,
+    endDate,
+    pickupLocation,
+    pickupTime,
+    dropoffLocation,
+    dropoffTime,
+    accommodation,
+    transport,
     priceEstimate,
     status: "pending" as const,
     notes,

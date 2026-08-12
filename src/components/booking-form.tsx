@@ -45,8 +45,26 @@ export function BookingForm({
     paymentNote?: string;
   } | null>(null);
   const [journey, setJourney] = useState(preselectedJourney ?? "");
-  const [travelers, setTravelers] = useState(2);
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
+  const travelers = Math.max(1, adults + children);
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
+
+  const ACCOMMODATION_OPTIONS = [
+    "Safari lodge",
+    "Luxury tented camp",
+    "Eco-camp / mobile camp",
+    "Beach villa / resort",
+    "Boutique hotel",
+    "Mountain lodge / trekking hut",
+  ];
+  const TRANSPORT_OPTIONS = [
+    "Private 4×4 Land Cruiser",
+    "Safari van (pop-up roof)",
+    "Private vehicle + light aircraft",
+    "Dhow & boat transfers",
+    "Expedition 4WD",
+  ];
 
   const toggleDestination = (label: string) => {
     setSelectedDestinations((prev) => {
@@ -206,26 +224,124 @@ export function BookingForm({
 
         <div className="grid grid-cols-2 gap-5">
           <div>
-            <label htmlFor="travelers" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
-              Travelers *
+            <label htmlFor="adults" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
+              Adults *
             </label>
             <input
-              id="travelers"
-              name="travelers"
+              id="adults"
+              name="adults"
               type="number"
               min={1}
               max={40}
-              value={travelers}
-              onChange={(e) => setTravelers(Number(e.target.value) || 1)}
+              value={adults}
+              onChange={(e) => setAdults(Math.max(1, Number(e.target.value) || 1))}
               required
               className={inputClass}
             />
           </div>
           <div>
+            <label htmlFor="children" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
+              Children
+            </label>
+            <input
+              id="children"
+              name="children"
+              type="number"
+              min={0}
+              max={20}
+              value={children}
+              onChange={(e) => setChildren(Math.max(0, Number(e.target.value) || 0))}
+              className={inputClass}
+            />
+            <p className="mt-1.5 text-[0.625rem] text-midnight/40">
+              {travelers} traveler{travelers === 1 ? "" : "s"} total
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-5">
+          <div>
             <label htmlFor="startDate" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
               Start date
             </label>
             <input id="startDate" name="startDate" type="date" className={inputClass} />
+          </div>
+          <div>
+            <label htmlFor="endDate" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
+              End date
+            </label>
+            <input id="endDate" name="endDate" type="date" className={inputClass} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-5">
+          <div>
+            <label htmlFor="pickupLocation" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
+              Pick-up location
+            </label>
+            <input
+              id="pickupLocation"
+              name="pickupLocation"
+              maxLength={160}
+              placeholder="e.g. Jomo Kenyatta Intl. Airport"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label htmlFor="pickupTime" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
+              Pick-up time
+            </label>
+            <input id="pickupTime" name="pickupTime" type="time" className={inputClass} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-5">
+          <div>
+            <label htmlFor="dropoffLocation" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
+              Drop-off location
+            </label>
+            <input
+              id="dropoffLocation"
+              name="dropoffLocation"
+              maxLength={160}
+              placeholder="e.g. Wilson Airport, Nairobi"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label htmlFor="dropoffTime" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
+              Drop-off time
+            </label>
+            <input id="dropoffTime" name="dropoffTime" type="time" className={inputClass} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-5">
+          <div>
+            <label htmlFor="accommodation" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
+              Accommodation style
+            </label>
+            <select id="accommodation" name="accommodation" defaultValue="" className={cn(inputClass, "appearance-none")}>
+              <option value="">Let us choose — surprise me</option>
+              {ACCOMMODATION_OPTIONS.map((o) => (
+                <option key={o} value={o}>
+                  {o}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="transport" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
+              Transport preference
+            </label>
+            <select id="transport" name="transport" defaultValue="" className={cn(inputClass, "appearance-none")}>
+              <option value="">Let us plan it</option>
+              {TRANSPORT_OPTIONS.map((o) => (
+                <option key={o} value={o}>
+                  {o}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -249,14 +365,14 @@ export function BookingForm({
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="notes" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
-            Anything we should know
+            Special requests
           </label>
           <textarea
             id="notes"
             name="notes"
             rows={4}
             maxLength={2000}
-            placeholder="Special occasions, travel style, flexibility on dates…"
+            placeholder="Dietary needs, accessibility, occasions, travel style…"
             className={cn(inputClass, "resize-y")}
           />
         </div>

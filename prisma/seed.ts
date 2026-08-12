@@ -7,8 +7,6 @@
  */
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
-
 /* ---------------------------------------------------------------- images */
 // Verified live Unsplash CDN photo IDs (checked 200 OK).
 const IMG = {
@@ -423,6 +421,7 @@ type SeedDestination = {
   longitude: number;
   bestExperiences: string[];
   trips: string[]; // adventure slugs
+  images?: string[]; // optional extra gallery (first = hero)
 };
 
 const destinations: SeedDestination[] = [
@@ -1660,8 +1659,195 @@ const gallery = [
   { image: IMG.travelMap, alt: "Plotting the next journey", category: "Culture", width: 3, height: 2 },
 ];
 
+/* ------------------------------------------------- destination galleries */
+// A second photo for popular destinations so invoices can show two images.
+const DEST_SECONDARY_IMAGE: Record<string, string> = {
+  "maasai-mara": "1500382017468-9049fed747ef", // savannah sunset
+  "the-coast": "1519046904884-53103b34b206", // beach
+  "diani-beach": "1507525428034-b723cf961d3e", // beach palms
+  "watamu": "1544551763-46a013bb70d5", // aerial coast
+  "mombasa": "1510414842594-a61c69b5ae57", // coastal shore
+  "lamu": "1518709268805-4e9042af9f23", // dhow
+  "amboseli": "1516426122078-c23e76319801", // elephants + Kilimanjaro
+  "mount-kenya": "1469474968028-56623f02e42e", // green highlands
+  "lake-naivasha": "1505118380757-91f5f5632de0", // lake canoe
+  "lake-nakuru": "1506744038136-46273834b3fb", // escarpment
+  "samburu": "1516026672322-bc52d61a55d5", // lions
+  "nairobi": "1472214103451-9374bd1c798e", // sunrise field
+  "hells-gate": "1534177616072-ef7dc120449d", // savanna
+  "saiwa-swamp": "1501785888041-af3ef285b470", // hike trail
+};
+
+/* ------------------------------------------------------- journey extras */
+// Per-trip-type inclusions/exclusions/accommodation/transport used on the
+// invoice and generated day-by-day itineraries from the journey's duration.
+const TRIP_CONFIG: Record<
+  string,
+  { inclusions: string[]; exclusions: string[]; accommodation: string; transport: string }
+> = {
+  Safari: {
+    inclusions: [
+      "All park & conservancy entry fees",
+      "Daily game drives in a private 4×4 with pop-up roof",
+      "Professional guide & spotter",
+      "Full-board lodge or tented camp accommodation",
+      "All meals & soft drinks",
+      "Airport & inter-park transfers",
+      "Emergency evacuation cover",
+    ],
+    exclusions: [
+      "International flights",
+      "Visas & travel insurance",
+      "Premium spirits & cellar wines",
+      "Tips & gratuities",
+      "Optional activities not listed",
+    ],
+    accommodation: "Hand-picked safari lodge or tented camp — private ensuite",
+    transport: "Private 4×4 Land Cruiser with pop-up roof",
+  },
+  Adventure: {
+    inclusions: [
+      "Professional guides, porters & cooks",
+      "All park & mountain entry fees",
+      "Lodge, hut or camp accommodation as per plan",
+      "All meals & drinking water",
+      "Group safety & first-aid kit",
+      "Transfers from the meeting point",
+    ],
+    exclusions: [
+      "International flights",
+      "Visas & travel insurance",
+      "Rentals of technical gear (sleeping bags, poles)",
+      "Tips & gratuities",
+      "Personal expenses",
+    ],
+    accommodation: "Mountain lodge, eco-camp or trekking hut as per plan",
+    transport: "Private 4×4 plus supported trekking logistics",
+  },
+  Coastal: {
+    inclusions: [
+      "Beach villa or boutique hotel accommodation",
+      "Daily breakfast & select meals",
+      "Dhow, boat & marine-park excursions as listed",
+      "Snorkelling gear",
+      "Airport & hotel transfers",
+      "Marine park entry fees",
+    ],
+    exclusions: [
+      "International flights",
+      "Visas & travel insurance",
+      "Diving courses & equipment hire",
+      "Alcoholic beverages",
+      "Tips & gratuities",
+    ],
+    accommodation: "Beach villa, resort or boutique Swahili hotel",
+    transport: "Private vehicle plus dhow & boat transfers",
+  },
+  Cultural: {
+    inclusions: [
+      "All guided tours, entry & conservancy fees",
+      "Private chauffeur-vehicle & driver",
+      "Hand-picked boutique accommodation",
+      "Select meals as listed",
+      "Community & cultural visit contributions",
+    ],
+    exclusions: [
+      "International flights",
+      "Visas & travel insurance",
+      "Alcoholic beverages",
+      "Tips & gratuities",
+      "Personal shopping",
+    ],
+    accommodation: "Boutique hotel, guesthouse or garden villa",
+    transport: "Private chauffeur-driven vehicle",
+  },
+  Luxury: {
+    inclusions: [
+      "Private suite or conservancy lodge accommodation",
+      "Private guide, vehicle & dedicated butler service",
+      "All meals, house wines & premium spirits",
+      "All park & conservancy fees",
+      "Airstrip transfers & light-aircraft flights",
+      "Laundry & sundowner setups",
+    ],
+    exclusions: [
+      "International flights",
+      "Visas & travel insurance",
+      "Champagne & cellar rarities beyond the house list",
+      "Spa treatments & optional excursions",
+      "Tips & gratuities",
+    ],
+    accommodation: "Private suite on a working conservancy or luxury lodge",
+    transport: "Private 4×4 plus optional light-aircraft transfers",
+  },
+  Expedition: {
+    inclusions: [
+      "Expedition 4WD vehicles & experienced drivers",
+      "Full camping kit (tents, beds, mess, cook)",
+      "All meals & drinking water",
+      "Local community & site fees",
+      "Fossil-site guiding where applicable",
+      "Group safety & evacuation planning",
+    ],
+    exclusions: [
+      "International flights",
+      "Visas & travel insurance",
+      "Alcoholic beverages",
+      "Tips & gratuities",
+      "Personal expenses",
+    ],
+    accommodation: "Mobile expedition camp or local bandas",
+    transport: "Purpose-built 4WD expedition vehicles",
+  },
+};
+
+/** Build a realistic day-by-day plan from the journey's duration & highlights. */
+function buildItinerary(a: SeedAdventure) {
+  const days = Math.max(1, Number.parseInt(a.duration) || 3);
+  const plan: { day: number; title: string; description: string }[] = [];
+  for (let i = 0; i < days; i++) {
+    if (i === 0) {
+      plan.push({
+        day: i + 1,
+        title: "Arrival & welcome",
+        description: `Arrive and settle in — met by your Karen Adventures host near ${a.location}. Evening welcome briefing and the first taste of the journey ahead.`,
+      });
+    } else if (i === days - 1) {
+      plan.push({
+        day: i + 1,
+        title: "Final day & departure",
+        description: `Morning activities at a relaxed pace, then transfers for departure — or extend your stay with a hand-crafted add-on.`,
+      });
+    } else {
+      const h =
+        a.highlights[(i - 1) % a.highlights.length] ?? "Guided exploration";
+      plan.push({
+        day: i + 1,
+        title: h,
+        description: `A full day in ${a.location} — ${h.toLowerCase()}, guided by people who know the land intimately, with a picnic lunch and golden-hour stops.`,
+      });
+    }
+  }
+  return plan;
+}
+
 /* ------------------------------------------------------------------ seed */
-async function main() {
+/**
+ * Populate the database. Exportable so the admin console can re-seed on demand
+ * (fixes empty destinations on Vercel without waiting for a redeploy).
+ */
+export async function runSeed() {
+  const prisma = new PrismaClient();
+  try {
+    return await seedWith(prisma);
+  } finally {
+    // Always release the connection — whether called from the CLI or the
+    // admin seed route.
+    await prisma.$disconnect().catch(() => {});
+  }
+}
+
+async function seedWith(prisma: PrismaClient) {
   console.log("Seeding Karen Adventures…");
 
   // Seed when the curated destination set isn't fully present. This lets the
@@ -1677,34 +1863,56 @@ async function main() {
     console.log(
       `✓ All ${seedSlugs.length} seed destinations already present — skipping seed (set SEED_FORCE=true to re-seed).`,
     );
-    return;
+    return { seeded: false, reason: "already-present" };
   }
 
-  // Adventures
+  // Adventures (enrich with invoice extras). Unless forced, an existing row is
+  // left untouched so admin edits survive — the seed only fills in missing
+  // records. SEED_FORCE=true refreshes everything.
+  const force = process.env.SEED_FORCE === "true";
   for (const a of adventures) {
+    const cfg = TRIP_CONFIG[a.tripType] ?? TRIP_CONFIG.Safari;
+    const data = {
+      ...a,
+      itinerary: buildItinerary(a),
+      inclusions: cfg.inclusions,
+      exclusions: cfg.exclusions,
+      accommodation: cfg.accommodation,
+      transport: cfg.transport,
+    };
     await prisma.adventure.upsert({
       where: { slug: a.slug },
-      update: a,
-      create: a,
+      update: force ? data : {},
+      create: data,
     });
   }
   console.log(`✓ ${adventures.length} adventures`);
 
-  // Destinations (connect recommended trips after both exist)
+  // Destinations (connect recommended trips after both exist).
   for (const d of destinations) {
     const { trips, ...data } = d;
     const tripsToLink = await prisma.adventure.findMany({
       where: { slug: { in: trips } },
       select: { id: true },
     });
+    const extra = DEST_SECONDARY_IMAGE[d.slug];
+    const gallery = (data as { images?: string[] }).images?.length
+      ? (data as { images?: string[] }).images!
+      : extra
+        ? [data.image, extra]
+        : [data.image];
     await prisma.destination.upsert({
       where: { slug: d.slug },
-      update: {
-        ...data,
-        recommendedTrips: { set: tripsToLink.map((t) => ({ id: t.id })) },
-      },
+      update: force
+        ? {
+            ...data,
+            images: gallery,
+            recommendedTrips: { set: tripsToLink.map((t) => ({ id: t.id })) },
+          }
+        : {},
       create: {
         ...data,
+        images: gallery,
         recommendedTrips: { connect: tripsToLink.map((t) => ({ id: t.id })) },
       },
     });
@@ -1820,7 +2028,17 @@ async function main() {
       destination: "Maasai Mara",
       destinations: ["Maasai Mara", "Lake Naivasha"],
       travelers: 2,
+      adults: 2,
+      children: 0,
       startDate: new Date("2026-09-14T00:00:00Z"),
+      endDate: new Date("2026-09-17T00:00:00Z"),
+      pickupLocation: "Jomo Kenyatta International Airport (NBO)",
+      pickupTime: "09:00",
+      dropoffLocation: "Wilson Airport, Nairobi",
+      dropoffTime: "16:30",
+      accommodation: "Luxury tented camp",
+      transport: "Private 4×4 Land Cruiser",
+      depositPaidKes: 260000,
       priceEstimate: 4900,
       status: "pending",
       notes: null,
@@ -1836,7 +2054,17 @@ async function main() {
       destination: "Mount Kenya",
       destinations: ["Mount Kenya", "Ol Pejeta Conservancy"],
       travelers: 6,
+      adults: 4,
+      children: 2,
       startDate: new Date("2026-08-10T00:00:00Z"),
+      endDate: new Date("2026-08-14T00:00:00Z"),
+      pickupLocation: "Nairobi Serena Hotel, Nairobi",
+      pickupTime: "06:30",
+      dropoffLocation: "Nanyuki airstrip",
+      dropoffTime: "12:00",
+      accommodation: "Mountain lodge & trekking huts",
+      transport: "Private 4×4 with climbing support",
+      depositPaidKes: 0,
       priceEstimate: 11340,
       status: "confirmed",
       notes: "Deposit paid. Pre-trek pack sent by email.",
@@ -1849,13 +2077,23 @@ async function main() {
   console.log(`✓ ${demoBookings.length} demo bookings`);
 
   console.log("Seed complete.");
+  return {
+    seeded: true,
+    adventures: adventures.length,
+    destinations: destinations.length,
+    experiences: experiences.length,
+    testimonials: testimonials.length,
+    gallery: gallery.length,
+    demoBookings: demoBookings.length,
+  };
 }
 
-main()
-  .catch((e) => {
+// Run automatically when executed directly (tsx prisma/seed.ts); when imported
+// (e.g. the admin seed route) callers invoke runSeed() themselves.
+const isDirect = process.argv[1] && process.argv[1].replace(/\\/g, "/").endsWith("seed.ts");
+if (isDirect) {
+  runSeed().catch((e) => {
     console.error(e);
     process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
   });
+}
