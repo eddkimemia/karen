@@ -1664,14 +1664,18 @@ const gallery = [
 async function main() {
   console.log("Seeding Karen Adventures…");
 
-  // Only seed an empty database. This lets the Vercel build populate a fresh
-  // production DB on first deploy while preserving admin edits (destinations,
-  // notes, statuses) on subsequent deploys. Force a full re-seed with:
+  // Seed when the curated destination set isn't fully present. This lets the
+  // Vercel build populate a fresh production DB (or fill in any missing seeded
+  // locations after manual adds/deletes) while preserving admin edits on
+  // already-seeded rows. Force a full re-seed with:
   //   SEED_FORCE=true npx prisma db seed
-  const existing = await prisma.destination.count();
-  if (existing > 0 && process.env.SEED_FORCE !== "true") {
+  const seedSlugs = destinations.map((d) => d.slug);
+  const present = await prisma.destination.count({
+    where: { slug: { in: seedSlugs } },
+  });
+  if (present === seedSlugs.length && process.env.SEED_FORCE !== "true") {
     console.log(
-      `✓ ${existing} destinations already present — skipping seed (set SEED_FORCE=true to re-seed).`,
+      `✓ All ${seedSlugs.length} seed destinations already present — skipping seed (set SEED_FORCE=true to re-seed).`,
     );
     return;
   }
@@ -1814,6 +1818,7 @@ async function main() {
       adventureSlug: "maasai-mara-safari",
       adventureTitle: "The Maasai Mara Safari",
       destination: "Maasai Mara",
+      destinations: ["Maasai Mara", "Lake Naivasha"],
       travelers: 2,
       startDate: new Date("2026-09-14T00:00:00Z"),
       priceEstimate: 4900,
@@ -1829,6 +1834,7 @@ async function main() {
       adventureSlug: "mount-kenya-adventure",
       adventureTitle: "Mount Kenya Adventure",
       destination: "Mount Kenya",
+      destinations: ["Mount Kenya", "Ol Pejeta Conservancy"],
       travelers: 6,
       startDate: new Date("2026-08-10T00:00:00Z"),
       priceEstimate: 11340,

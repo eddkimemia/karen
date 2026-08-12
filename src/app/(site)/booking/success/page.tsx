@@ -112,12 +112,17 @@ export default async function BookingSuccessPage({
       if (v.data?.status === "success") {
         paid = true;
         paidKes = v.data.amount / 100;
-        await prisma.booking.update({
-          where: { id: booking.id },
+        // Idempotent confirm — a webhook may have confirmed first (or a refresh
+        // re-run this page); never re-confirm or re-email an already-confirmed
+        // booking.
+        const updated = await prisma.booking.updateMany({
+          where: { id: booking.id, status: { not: "confirmed" } },
           data: { status: "confirmed" },
         });
-        // Email the guest their confirmation (never blocks the page).
-        await sendBookingConfirmation(booking);
+        if (updated.count > 0) {
+          // Email the guest their confirmation (never blocks the page).
+          await sendBookingConfirmation(booking);
+        }
       } else {
         verifyError = v.data?.gateway_response ?? null;
       }
@@ -173,8 +178,8 @@ export default async function BookingSuccessPage({
           {/* Receipt */}
           <div className="mt-8 space-y-4 border-t border-midnight/10 pt-7 text-left">
             <ReceiptRow icon={CalendarDays} label="Journey" value={booking.adventureTitle} />
-            {booking.destination && (
-              <ReceiptRow icon={Users} label="Destination" value={booking.destination} />
+            {booking.destinations.length > 0 && (
+              <ReceiptRow icon={Users} label="Destinations" value={booking.destinations.join(" · ")} />
             )}
             <ReceiptRow icon={Users} label="Travelers" value={`${booking.travelers} guest${booking.travelers === 1 ? "" : "s"}`} />
             <ReceiptRow icon={Clock} label="Start date" value={fmtDate(booking.startDate)} />

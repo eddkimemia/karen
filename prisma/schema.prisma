@@ -113,6 +113,7 @@ model Booking {
   adventureSlug  String?
   adventureTitle String
   destination    String?
+  destinations   String[]  @default([]) // all locations a guest wants to visit
   travelers      Int
   startDate      DateTime?
   priceEstimate  Int

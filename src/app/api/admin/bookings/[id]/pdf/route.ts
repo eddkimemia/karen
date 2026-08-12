@@ -18,7 +18,23 @@ export async function GET(
     return new Response("Booking not found", { status: 404 });
   }
 
-  const pdf = await buildBookingPdf(booking);
+  // Build a fresh PDF from the DB record (logo, itinerary & images best-effort).
+  const pdf = await buildBookingPdf({
+    reference: booking.reference,
+    adventureSlug: booking.adventureSlug,
+    adventureTitle: booking.adventureTitle,
+    destination: booking.destination,
+    destinations: booking.destinations,
+    name: booking.name,
+    email: booking.email,
+    phone: booking.phone,
+    travelers: booking.travelers,
+    startDate: booking.startDate,
+    priceEstimate: booking.priceEstimate,
+    status: booking.status,
+    notes: booking.notes,
+    createdAt: booking.createdAt,
+  });
 
   return new Response(new Uint8Array(pdf), {
     headers: {

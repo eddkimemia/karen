@@ -10,5 +10,5 @@ export function whatsappLink(message: string = WHATSAPP_MESSAGE) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
-export const CONTACT_EMAIL = "journeys@karenadventures.com";
+export const CONTACT_EMAIL = "booking@karenadventures.com";
 export const CONTACT_PHONE_DISPLAY = WHATSAPP_DISPLAY;

@@ -33,6 +33,11 @@ export async function POST(req: Request) {
   const phone = clean(b.phone).slice(0, 30) || null;
   const adventureSlug = clean(b.adventureSlug).slice(0, 160) || null;
   const destination = clean(b.destination).slice(0, 120) || null;
+  const destinations = clean(b.destinations)
+    .split(/[\n,]+/)
+    .map((d) => d.trim().slice(0, 120))
+    .filter(Boolean)
+    .slice(0, 8);
   const notes = clean(b.notes).slice(0, 2000) || null;
   const startDateRaw = clean(b.startDate).slice(0, 20);
   const travelers = Number(b.travelers);
@@ -68,6 +73,19 @@ export async function POST(req: Request) {
   const priceEstimate = adventure ? adventure.startingPrice * travelers : 0;
   let reference = makeReference();
 
+  // Destination list: prefer the chosen multiple locations; fall back to the
+  // adventure's location; always keep the single `destination` field for the
+  // primary location (used in admin filters & map links).
+  const destinationList = destinations.length
+    ? destinations
+    : adventure?.location
+      ? [adventure.location]
+      : destination
+        ? [destination]
+        : [];
+  const primaryDestination =
+    adventure?.location ?? destinationList[0] ?? destination;
+
   // Build the record once; retry with a fresh reference on the (rare) collision.
   const record = () => ({
     reference,
@@ -77,8 +95,11 @@ export async function POST(req: Request) {
     adventureSlug: adventure?.slug ?? null,
     adventureTitle:
       adventure?.title ??
-      (destination ? `${destination} — custom journey` : "Custom journey"),
-    destination: adventure?.location ?? destination,
+      (primaryDestination
+        ? `${primaryDestination} — custom journey`
+        : "Custom journey"),
+    destination: primaryDestination ?? null,
+    destinations: destinationList,
     travelers,
     startDate,
     priceEstimate,
@@ -94,6 +115,7 @@ export async function POST(req: Request) {
     email: string;
     phone: string | null;
     destination: string | null;
+    destinations: string[];
     travelers: number;
     startDate: Date | null;
     priceEstimate: number;
@@ -113,6 +135,7 @@ export async function POST(req: Request) {
           email: true,
           phone: true,
           destination: true,
+          destinations: true,
           travelers: true,
           startDate: true,
           priceEstimate: true,

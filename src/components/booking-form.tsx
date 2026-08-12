@@ -15,6 +15,8 @@ import { whatsappLink } from "@/lib/site";
 type Journey = { value: string; label: string; price: number };
 type Destination = { value: string; label: string };
 
+const DESTINATION_LIMIT = 8;
+
 type Props = {
   journeys: Journey[];
   destinations: Destination[];
@@ -44,6 +46,15 @@ export function BookingForm({
   } | null>(null);
   const [journey, setJourney] = useState(preselectedJourney ?? "");
   const [travelers, setTravelers] = useState(2);
+  const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
+
+  const toggleDestination = (label: string) => {
+    setSelectedDestinations((prev) => {
+      if (prev.includes(label)) return prev.filter((d) => d !== label);
+      if (prev.length >= DESTINATION_LIMIT) return prev;
+      return [...prev, label];
+    });
+  };
 
   const selected = useMemo(
     () => journeys.find((j) => j.value === journey) ?? null,
@@ -59,12 +70,14 @@ export function BookingForm({
     setFormError(null);
     const fd = new FormData(e.currentTarget);
 
-    if (!selected && !String(fd.get("destination") ?? "").trim()) {
+    if (!selected && selectedDestinations.length === 0) {
       setFormError(
-        "Pick a journey or tell us a destination — or choose 'Custom journey' and we'll design it together.",
+        "Pick a journey or choose at least one destination — or select 'Custom journey' and we'll design it together.",
       );
       return;
     }
+    // Record selected locations (one per line) for the API.
+    fd.set("destinations", selectedDestinations.join("\n"));
 
     setStatus("loading");
     try {
@@ -152,16 +165,43 @@ export function BookingForm({
           </select>
         </div>
 
-        <div>
-          <label htmlFor="destination" className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
-            Destination / region
+        <div className="sm:col-span-2">
+          <label className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
+            Destinations{" "}
+            <span className="font-sans text-[0.625rem] normal-case tracking-normal text-midnight/40">
+              (choose one or more)
+            </span>
           </label>
-          <select id="destination" name="destination" defaultValue="" className={cn(inputClass, "appearance-none")}>
-            <option value="">Anywhere in Kenya</option>
-            {destinations.map((d) => (
-              <option key={d.value} value={d.label}>{d.label}</option>
-            ))}
-          </select>
+          <div className="flex flex-wrap gap-2">
+            {destinations.map((d) => {
+              const active = selectedDestinations.includes(d.label);
+              return (
+                <button
+                  key={d.value}
+                  type="button"
+                  onClick={() => toggleDestination(d.label)}
+                  aria-pressed={active}
+                  className={cn(
+                    "border px-3.5 py-2 text-xs font-medium transition-all duration-200",
+                    active
+                      ? "border-gold bg-gold/15 text-midnight"
+                      : "border-midnight/15 bg-white text-midnight/60 hover:border-gold/60 hover:text-midnight",
+                  )}
+                >
+                  {d.label}
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-[0.6875rem] text-midnight/45">
+            {selectedDestinations.length === 0
+              ? "Anywhere in Kenya — tell us your dream and we'll plan around it."
+              : `${selectedDestinations.length} selected${
+                  selectedDestinations.length >= DESTINATION_LIMIT
+                    ? ` (max ${DESTINATION_LIMIT})`
+                    : ""
+                } — pick up to ${DESTINATION_LIMIT} locations.`}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-5">

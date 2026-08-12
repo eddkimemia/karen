@@ -37,6 +37,7 @@ export default async function AdminBookingsPage({
     phone: b.phone,
     adventureTitle: b.adventureTitle,
     destination: b.destination,
+    destinations: b.destinations,
     travelers: b.travelers,
     startDate: b.startDate?.toISOString() ?? null,
     priceEstimate: b.priceEstimate,

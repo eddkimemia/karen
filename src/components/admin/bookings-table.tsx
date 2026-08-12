@@ -14,6 +14,7 @@ export type BookingRow = {
   phone: string | null;
   adventureTitle: string;
   destination: string | null;
+  destinations: string[];
   travelers: number;
   startDate: string | null;
   priceEstimate: number;
@@ -181,7 +182,11 @@ export function BookingsTable({
                 {b.phone ? ` · ${b.phone}` : ""}
               </p>
             </Field>
-            <Field label="Destination">{b.destination ?? "—"}</Field>
+            <Field label="Destination">
+              {b.destinations.length > 0
+                ? b.destinations.join(", ")
+                : (b.destination ?? "—")}
+            </Field>
             <Field label="Travelers">{b.travelers}</Field>
             <Field label="Start date">{fmtDate(b.startDate)}</Field>
             <Field label="Estimate (USD)">{formatPrice(b.priceEstimate)}</Field>

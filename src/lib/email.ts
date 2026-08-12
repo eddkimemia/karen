@@ -17,11 +17,13 @@ type InquiryLike = {
 
 type BookingLike = {
   reference: string;
+  adventureSlug?: string | null;
   adventureTitle: string;
   name: string;
   email: string;
   phone: string | null;
   destination: string | null;
+  destinations?: string[];
   travelers: number;
   startDate: Date | null;
   priceEstimate: number;
@@ -197,7 +199,7 @@ export async function notifyNewBooking(b: BookingLike) {
       ${detailRow("Guest", b.name)}
       ${detailRow("Email", `<a href="mailto:${b.email}" style="color:${GOLD};">${b.email}</a>`)}
       ${detailRow("Phone", b.phone ?? "—")}
-      ${detailRow("Destination", b.destination ?? "—")}
+      ${detailRow("Destinations", (b.destinations?.length ? b.destinations : b.destination ? [b.destination] : []).join(", ") || "—")}
       ${detailRow("Travelers", String(b.travelers))}
       ${detailRow("Start date", b.startDate ? b.startDate.toISOString().slice(0, 10) : "Flexible")}
       ${detailRow("Estimate", b.priceEstimate > 0 ? `${formatPrice(b.priceEstimate)} (KES ${Math.round(b.priceEstimate * (Number(process.env.USD_TO_KES_RATE) || 130)).toLocaleString("en-KE")})` : "To be designed")}
@@ -229,14 +231,15 @@ export async function sendBookingConfirmation(b: BookingLike) {
     <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
       ${detailRow("Booking ref", b.reference)}
       ${detailRow("Journey", b.adventureTitle)}
-      ${detailRow("Destination", b.destination ?? "—")}
+      ${detailRow("Destinations", (b.destinations?.length ? b.destinations : b.destination ? [b.destination] : []).join(", ") || "—")}
       ${detailRow("Travelers", String(b.travelers))}
       ${detailRow("Start date", b.startDate ? b.startDate.toISOString().slice(0, 10) : "Flexible")}
       ${detailRow("Estimate", b.priceEstimate > 0 ? formatPrice(b.priceEstimate) : "To be designed")}
     </table>
     <p style="margin:22px 0 0;color:#444;font-size:14px;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">
-      A copy of your booking confirmation is attached as a PDF. Questions in the
-      meantime? Chat with us on WhatsApp at <a href="${whatsappLink()}" style="color:${GOLD};">${WHATSAPP_DISPLAY}</a> or reply to this email.
+      A copy of your booking confirmation — including your destinations and
+      itinerary highlights — is attached as a PDF. Questions in the meantime?
+      Chat with us on WhatsApp at <a href="${whatsappLink()}" style="color:${GOLD};">${WHATSAPP_DISPLAY}</a> or reply to this email.
     </p>`;
 
   // Generate the branded PDF (best-effort — a failure shouldn't block email).
@@ -244,8 +247,10 @@ export async function sendBookingConfirmation(b: BookingLike) {
   try {
     pdf = await buildBookingPdf({
       reference: b.reference,
+      adventureSlug: b.adventureSlug ?? null,
       adventureTitle: b.adventureTitle,
       destination: b.destination,
+      destinations: b.destinations ?? [],
       name: b.name,
       email: b.email,
       phone: b.phone,
@@ -292,7 +297,7 @@ export async function notifyTeamBookingPaid(b: BookingLike) {
       ${detailRow("Guest", b.name)}
       ${detailRow("Email", `<a href="mailto:${b.email}" style="color:${GOLD};">${b.email}</a>`)}
       ${detailRow("Phone", b.phone ?? "—")}
-      ${detailRow("Destination", b.destination ?? "—")}
+      ${detailRow("Destinations", (b.destinations?.length ? b.destinations : b.destination ? [b.destination] : []).join(", ") || "—")}
       ${detailRow("Travelers", String(b.travelers))}
       ${detailRow("Start date", b.startDate ? b.startDate.toISOString().slice(0, 10) : "Flexible")}
       ${detailRow("Estimate", b.priceEstimate > 0 ? formatPrice(b.priceEstimate) : "To be designed")}
@@ -306,8 +311,10 @@ export async function notifyTeamBookingPaid(b: BookingLike) {
   try {
     pdf = await buildBookingPdf({
       reference: b.reference,
+      adventureSlug: b.adventureSlug ?? null,
       adventureTitle: b.adventureTitle,
       destination: b.destination,
+      destinations: b.destinations ?? [],
       name: b.name,
       email: b.email,
       phone: b.phone,
