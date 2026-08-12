@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MapPin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { ensureCatalogSeeded } from "@/lib/self-seed";
 import { img } from "@/lib/utils";
 import { Reveal } from "@/components/reveal";
 import { PageHeader } from "@/components/page-header";
@@ -17,6 +18,9 @@ export const metadata: Metadata = {
 };
 
 export default async function DestinationsPage() {
+  // Self-heal an empty catalog (fresh production DB) on first visit.
+  await ensureCatalogSeeded();
+
   const destinations = await prisma.destination.findMany({
     orderBy: { name: "asc" },
     include: {

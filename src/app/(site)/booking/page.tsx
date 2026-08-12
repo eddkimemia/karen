@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CalendarCheck2, Landmark, MessageCircle, ShieldCheck } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { ensureCatalogSeeded } from "@/lib/self-seed";
 import { Reveal } from "@/components/reveal";
 import { PageHeader } from "@/components/page-header";
 import { BookingForm } from "@/components/booking-form";
@@ -40,6 +41,9 @@ export default async function BookingPage({
 }: {
   searchParams: Promise<{ adventure?: string }>;
 }) {
+  // Self-heal an empty catalog (fresh production DB) on first visit.
+  await ensureCatalogSeeded();
+
   const [{ adventure }, journeys, destinations] = await Promise.all([
     searchParams,
     prisma.adventure.findMany({

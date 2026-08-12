@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { ensureCatalogSeeded } from "@/lib/self-seed";
 import { Hero } from "@/components/hero";
 import { Journeys } from "@/components/journeys";
 import { ExperiencesSection } from "@/components/experiences-section";
@@ -11,6 +12,9 @@ import { CtaSection } from "@/components/cta-section";
 export const revalidate = 60;
 
 export default async function Home() {
+  // Self-heal an empty catalog (fresh production DB) on first visit.
+  await ensureCatalogSeeded();
+
   const [featured, experiences, destinations, testimonials, gallery] =
     await Promise.all([
       prisma.adventure.findMany({

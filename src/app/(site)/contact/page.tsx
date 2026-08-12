@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MapPin, Mail, Clock } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { ensureCatalogSeeded } from "@/lib/self-seed";
 import { Reveal } from "@/components/reveal";
 import { PageHeader } from "@/components/page-header";
 import { ContactForm } from "@/components/contact-form";
@@ -48,6 +49,9 @@ export default async function ContactPage({
 }: {
   searchParams: Promise<{ destination?: string; adventure?: string }>;
 }) {
+  // Self-heal an empty catalog (fresh production DB) on first visit.
+  await ensureCatalogSeeded();
+
   const [{ destination, adventure }, destinations, journeys] = await Promise.all([
     searchParams,
     prisma.destination.findMany({
