@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Save, Trash2 } from "lucide-react";
+import { FileText, Loader2, Save, Trash2 } from "lucide-react";
 import { AdminCard, EmptyState, Field, StatusPill } from "@/components/admin/ui";
 import { formatPrice } from "@/lib/utils";
 
@@ -118,6 +118,16 @@ export function BookingsTable({
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <a
+                href={`/api/admin/bookings/${b.id}/pdf`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 border border-ivory/20 px-3 py-1.5 text-xs text-ivory/70 transition-colors hover:border-gold hover:text-gold"
+                title="Open booking PDF"
+              >
+                <FileText className="h-3.5 w-3.5" />
+                PDF
+              </a>
               <StatusPill status={b.status} />
               <select
                 value={b.status}

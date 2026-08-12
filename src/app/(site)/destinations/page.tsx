@@ -13,7 +13,7 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "Destinations",
   description:
-    "Explore Kenya's destinations — the Maasai Mara, Amboseli, Mount Kenya, the Rift Valley lakes, Samburu, Turkana and the Indian Ocean coast.",
+    "Explore Kenya's destinations — the Maasai Mara, Amboseli, Mount Kenya, the Rift Valley lakes and craters, the national parks and marine reserves, Samburu, Turkana and the Indian Ocean coast.",
 };
 
 export default async function DestinationsPage() {
@@ -33,11 +33,11 @@ export default async function DestinationsPage() {
         eyebrow="The Map of Kenya"
         title={
           <>
-            Twelve Worlds,{" "}
+            {destinations.length} Worlds,{" "}
             <em className="font-serif italic text-gold">One Country.</em>
           </>
         }
-        description="From Nairobi's green suburbs to the jade waters of Turkana — the destinations we know best, and the journeys that belong to each one."
+        description="From Nairobi's green suburbs to the jade waters of Turkana, from the calderas of the Rift to the reefs of the Indian Ocean — the destinations we know best, and the journeys that belong to each one."
         image="1547721064-da6cfb341d50"
         imageAlt="A giraffe reaching into acacia trees at golden hour"
         align="center"

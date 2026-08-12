@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { prisma } from "@/lib/prisma";
+import { sendBookingConfirmation } from "@/lib/email";
 import { paystackWebhookSecret } from "@/lib/paystack";
 
 /**
@@ -35,10 +36,21 @@ export async function POST(req: Request) {
   }
 
   if (event.event === "charge.success" && event.data?.reference) {
-    await prisma.booking.updateMany({
-      where: { reference: event.data.reference },
+    // Confirm the booking, then email the guest their branded confirmation PDF.
+    // The status filter keeps this idempotent — a webhook retry (or a race with
+    // the success page) won't re-confirm or re-email an already-confirmed booking.
+    const updated = await prisma.booking.updateMany({
+      where: { reference: event.data.reference, status: { not: "confirmed" } },
       data: { status: "confirmed" },
     });
+    if (updated.count > 0) {
+      const booking = await prisma.booking.findUnique({
+        where: { reference: event.data.reference },
+      });
+      if (booking) {
+        await sendBookingConfirmation(booking);
+      }
+    }
   }
 
   return NextResponse.json({ ok: true });

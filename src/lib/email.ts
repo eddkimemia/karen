@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { formatPrice } from "@/lib/utils";
+import { buildBookingPdf } from "@/lib/pdf";
 import { CONTACT_EMAIL, WHATSAPP_DISPLAY, whatsappLink } from "@/lib/site";
 
 /* Subsets of the Prisma models — enough to build every email. */
@@ -26,6 +27,7 @@ type BookingLike = {
   priceEstimate: number;
   status: string;
   notes: string | null;
+  createdAt?: Date;
 };
 
 /* ------------------------------------------------------------------ */
@@ -66,13 +68,20 @@ type MailOptions = {
   subject: string;
   text: string;
   html: string;
+  attachments?: { filename: string; content: Buffer }[];
 };
 
 /**
  * Send an email. Returns false (and logs) if SMTP isn't configured or the
  * send fails — callers should never let email break the main flow.
  */
-export async function sendMail({ to, subject, text, html }: MailOptions) {
+export async function sendMail({
+  to,
+  subject,
+  text,
+  html,
+  attachments,
+}: MailOptions) {
   if (!smtpConfigured()) {
     console.warn(
       "[mail] SMTP not configured (SMTP_HOST/SMTP_USER) — email skipped.",
@@ -86,6 +95,7 @@ export async function sendMail({ to, subject, text, html }: MailOptions) {
       subject,
       text,
       html,
+      attachments,
     });
     return true;
   } catch (err) {
@@ -206,7 +216,10 @@ export async function notifyNewBooking(b: BookingLike) {
   });
 }
 
-/** Confirmation to the guest once their deposit is confirmed. */
+/**
+ * Confirmation to the guest once their deposit is confirmed — includes the
+ * branded booking PDF as an attachment (never blocks on PDF failures).
+ */
 export async function sendBookingConfirmation(b: BookingLike) {
   const body = `
     <p style="margin:0 0 20px;color:#444;font-size:15px;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">
@@ -222,14 +235,44 @@ export async function sendBookingConfirmation(b: BookingLike) {
       ${detailRow("Estimate", b.priceEstimate > 0 ? formatPrice(b.priceEstimate) : "To be designed")}
     </table>
     <p style="margin:22px 0 0;color:#444;font-size:14px;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">
-      Questions in the meantime? Chat with us on WhatsApp at <a href="${whatsappLink()}" style="color:${GOLD};">${WHATSAPP_DISPLAY}</a> or reply to this email.
+      A copy of your booking confirmation is attached as a PDF. Questions in the
+      meantime? Chat with us on WhatsApp at <a href="${whatsappLink()}" style="color:${GOLD};">${WHATSAPP_DISPLAY}</a> or reply to this email.
     </p>`;
+
+  // Generate the branded PDF (best-effort — a failure shouldn't block email).
+  let pdf: Buffer | null = null;
+  try {
+    pdf = await buildBookingPdf({
+      reference: b.reference,
+      adventureTitle: b.adventureTitle,
+      destination: b.destination,
+      name: b.name,
+      email: b.email,
+      phone: b.phone,
+      travelers: b.travelers,
+      startDate: b.startDate,
+      priceEstimate: b.priceEstimate,
+      status: b.status,
+      notes: b.notes,
+      createdAt: b.createdAt ?? new Date(),
+    });
+  } catch (err) {
+    console.error("[mail] Failed to generate booking PDF:", err);
+  }
 
   return sendMail({
     to: b.email,
     subject: `Your Karen Adventures booking is confirmed (${b.reference})`,
     text: `Karibu! Your booking ${b.reference} for ${b.adventureTitle} is confirmed. A planner will be in touch within one working day.`,
     html: shell("Karibu — you're booked.", body),
+    attachments: pdf
+      ? [
+          {
+            filename: `karen-adventures-booking-${b.reference}.pdf`,
+            content: pdf,
+          },
+        ]
+      : undefined,
   });
 }
 

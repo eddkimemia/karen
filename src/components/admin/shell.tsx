@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   LogOut,
   Mail,
+  MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +17,7 @@ const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/inquiries", label: "Inquiries", icon: Inbox },
   { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck2 },
+  { href: "/admin/destinations", label: "Destinations", icon: MapPin },
   { href: "/admin/subscribers", label: "Subscribers", icon: Mail },
 ];
 
