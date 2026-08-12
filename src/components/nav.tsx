@@ -216,6 +216,7 @@ export function Nav() {
             >
               <Link
                 href="/booking"
+                onClick={closeMobileMenu}
                 className="flex items-center justify-center gap-2 bg-gold px-8 py-4 text-sm font-medium uppercase tracking-[0.2em] text-midnight"
               >
                 Reserve Your Journey <ArrowRight className="h-4 w-4" />

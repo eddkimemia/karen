@@ -23,7 +23,8 @@ export async function GET(
   return new Response(new Uint8Array(pdf), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="karen-adventures-booking-${booking.reference}.pdf"`,
+      "Content-Disposition": `attachment; filename="karen-adventures-booking-${booking.reference}.pdf"`,
+      "Content-Length": String(pdf.length),
       "Cache-Control": "private, no-store",
     },
   });

@@ -44,6 +44,30 @@ export function BookingsTable({
   const [savingId, setSavingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  async function downloadPdf(b: BookingRow) {
+    setSavingId(b.id);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/bookings/${b.id}/pdf`);
+      if (!res.ok) {
+        throw new Error((await res.text()) || "PDF download failed");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `karen-adventures-booking-${b.reference}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "PDF download failed");
+    } finally {
+      setSavingId(null);
+    }
+  }
+
   async function updateStatus(id: string, status: string) {
     setSavingId(id);
     setError(null);
@@ -118,16 +142,20 @@ export function BookingsTable({
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <a
-                href={`/api/admin/bookings/${b.id}/pdf`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 border border-ivory/20 px-3 py-1.5 text-xs text-ivory/70 transition-colors hover:border-gold hover:text-gold"
-                title="Open booking PDF"
+              <button
+                type="button"
+                onClick={() => downloadPdf(b)}
+                disabled={savingId === b.id}
+                className="inline-flex items-center gap-2 border border-ivory/20 px-3 py-1.5 text-xs text-ivory/70 transition-colors hover:border-gold hover:text-gold disabled:opacity-50"
+                title="Download booking PDF"
               >
                 <FileText className="h-3.5 w-3.5" />
-                PDF
-              </a>
+                {savingId === b.id ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  "PDF"
+                )}
+              </button>
               <StatusPill status={b.status} />
               <select
                 value={b.status}

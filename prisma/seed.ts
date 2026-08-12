@@ -1664,6 +1664,18 @@ const gallery = [
 async function main() {
   console.log("Seeding Karen Adventures…");
 
+  // Only seed an empty database. This lets the Vercel build populate a fresh
+  // production DB on first deploy while preserving admin edits (destinations,
+  // notes, statuses) on subsequent deploys. Force a full re-seed with:
+  //   SEED_FORCE=true npx prisma db seed
+  const existing = await prisma.destination.count();
+  if (existing > 0 && process.env.SEED_FORCE !== "true") {
+    console.log(
+      `✓ ${existing} destinations already present — skipping seed (set SEED_FORCE=true to re-seed).`,
+    );
+    return;
+  }
+
   // Adventures
   for (const a of adventures) {
     await prisma.adventure.upsert({

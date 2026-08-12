@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { prisma } from "@/lib/prisma";
-import { sendBookingConfirmation } from "@/lib/email";
+import { notifyTeamBookingPaid, sendBookingConfirmation } from "@/lib/email";
 import { paystackWebhookSecret } from "@/lib/paystack";
 
 /**
@@ -49,6 +49,7 @@ export async function POST(req: Request) {
       });
       if (booking) {
         await sendBookingConfirmation(booking);
+        await notifyTeamBookingPaid(booking);
       }
     }
   }

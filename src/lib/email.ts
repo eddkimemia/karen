@@ -276,6 +276,68 @@ export async function sendBookingConfirmation(b: BookingLike) {
   });
 }
 
+/**
+ * Team copy of a paid booking — the invoice PDF attached for records.
+ * Sent alongside the guest confirmation when a deposit clears.
+ */
+export async function notifyTeamBookingPaid(b: BookingLike) {
+  const body = `
+    <p style="margin:0 0 20px;color:#444;font-size:15px;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">
+      A deposit has been received and this booking is now confirmed. The
+      customer&rsquo;s branded invoice is attached for your records.
+    </p>
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+      ${detailRow("Booking ref", b.reference)}
+      ${detailRow("Journey", b.adventureTitle)}
+      ${detailRow("Guest", b.name)}
+      ${detailRow("Email", `<a href="mailto:${b.email}" style="color:${GOLD};">${b.email}</a>`)}
+      ${detailRow("Phone", b.phone ?? "—")}
+      ${detailRow("Destination", b.destination ?? "—")}
+      ${detailRow("Travelers", String(b.travelers))}
+      ${detailRow("Start date", b.startDate ? b.startDate.toISOString().slice(0, 10) : "Flexible")}
+      ${detailRow("Estimate", b.priceEstimate > 0 ? formatPrice(b.priceEstimate) : "To be designed")}
+    </table>
+    <p style="margin:24px 0 0;font-family:Arial,Helvetica,sans-serif;">
+      <a href="${process.env.APP_URL ?? "http://localhost:3000"}/admin/bookings" style="background:${GOLD};color:${NAVY};padding:12px 20px;text-decoration:none;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;">Open in admin</a>
+    </p>`;
+
+  // Same branded PDF as the guest receives (best-effort).
+  let pdf: Buffer | null = null;
+  try {
+    pdf = await buildBookingPdf({
+      reference: b.reference,
+      adventureTitle: b.adventureTitle,
+      destination: b.destination,
+      name: b.name,
+      email: b.email,
+      phone: b.phone,
+      travelers: b.travelers,
+      startDate: b.startDate,
+      priceEstimate: b.priceEstimate,
+      status: b.status,
+      notes: b.notes,
+      createdAt: b.createdAt ?? new Date(),
+    });
+  } catch (err) {
+    console.error("[mail] Failed to generate team invoice PDF:", err);
+  }
+
+  return sendMail({
+    to: teamEmail(),
+    subject: `Invoice paid — ${b.reference} (${b.adventureTitle})`,
+    text: `Deposit received for ${b.reference} — ${b.adventureTitle}. Invoice attached.`,
+    html: shell("Invoice received", body),
+    attachments: pdf
+      ? [
+          {
+            filename: `karen-adventures-booking-${b.reference}.pdf`,
+            content: pdf,
+          },
+        ]
+      : undefined,
+  });
+}
+
 /** New newsletter subscriber → the team. */
 export async function notifyNewSubscriber(email: string) {
   return sendMail({
