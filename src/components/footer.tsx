@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { cache } from "react";
 import { MapPin, Phone, Mail, ArrowRight } from "lucide-react";
@@ -55,13 +56,14 @@ export async function Footer() {
         <div className="grid gap-12 md:grid-cols-12 md:gap-8">
           {/* Brand */}
           <div className="md:col-span-4">
-            <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center border border-gold/60 font-serif text-2xl font-medium text-gold">
-                K
-              </span>
-              <span className="font-serif text-2xl font-medium text-ivory">
-                Karen Adventures<span className="text-gold">.</span>
-              </span>
+            <div className="flex items-center">
+              <Image
+                src="/images/logo.png"
+                alt="Karen Adventures"
+                width={612}
+                height={408}
+                className="h-28 w-auto object-contain"
+              />
             </div>
             <p className="mt-4 font-serif text-lg italic text-champagne/90">
               Discover Kenya. Beyond the Ordinary.

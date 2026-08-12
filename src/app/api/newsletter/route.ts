@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { notifyNewSubscriber, sendSubscriberWelcome } from "@/lib/email";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -22,11 +23,15 @@ export async function POST(req: Request) {
   }
 
   try {
+    const existing = await prisma.subscriber.findUnique({ where: { email } });
     await prisma.subscriber.upsert({
       where: { email },
       update: {},
       create: { email },
     });
+    // Notify the team; welcome genuinely new subscribers.
+    await notifyNewSubscriber(email);
+    if (!existing) await sendSubscriberWelcome(email);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json(

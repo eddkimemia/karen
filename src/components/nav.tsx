@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,10 +18,16 @@ const LINKS = [
   { href: "/adventures", label: "Adventures" },
   { href: "/destinations", label: "Destinations" },
   { href: "/experiences", label: "Experiences" },
-  { href: "/booking", label: "Book" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
+
+const LOGO = {
+  src: "/images/logo.png",
+  width: 612,
+  height: 408,
+  alt: "Karen Adventures",
+};
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -77,35 +84,28 @@ export function Nav() {
           {/* Wordmark */}
           <Link
             href="/"
-            className="group flex items-center gap-3"
+            className="group flex items-center"
             aria-label="Karen Adventures — home"
           >
-            <span className="flex h-10 w-10 items-center justify-center border border-gold/60 font-serif text-xl font-medium text-gold transition-colors duration-300 group-hover:bg-gold group-hover:text-midnight">
-              K
-            </span>
-            <span className="flex flex-col leading-none">
-              <span className="font-serif text-[1.35rem] font-medium tracking-wide text-ivory">
-                Karen Adventures<span className="text-gold">.</span>
-              </span>
-              <span
-                className={cn(
-                  "mt-1 text-[0.5625rem] font-medium uppercase tracking-[0.42em] text-champagne/80 transition-opacity duration-500",
-                  scrolled ? "opacity-70" : "opacity-100",
-                )}
-              >
-                Nairobi · Kenya
-              </span>
-            </span>
+            <Image
+              {...LOGO}
+              alt={LOGO.alt}
+              priority
+              className="h-16 w-auto object-contain transition-opacity duration-300 group-hover:opacity-85 sm:h-20"
+            />
           </Link>
 
           {/* Desktop links */}
-          <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
+          <nav
+            className="hidden items-center gap-4 lg:flex xl:gap-6"
+            aria-label="Primary"
+          >
             {LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "group relative py-2 text-[0.75rem] font-medium uppercase tracking-[0.22em] transition-colors duration-300",
+                  "group relative py-2 text-[0.75rem] font-medium uppercase tracking-[0.18em] transition-colors duration-300",
                   isActive(link.href)
                     ? "text-champagne"
                     : "text-ivory/75 hover:text-ivory",
@@ -126,7 +126,7 @@ export function Nav() {
           <div className="flex items-center gap-4">
             <Link
               href="/booking"
-              className="group hidden items-center gap-2 border border-gold/60 px-6 py-2.5 text-[0.75rem] font-medium uppercase tracking-[0.2em] text-champagne transition-all duration-300 hover:border-gold hover:bg-gold hover:text-midnight sm:flex"
+              className="group hidden items-center gap-2 border border-gold/60 px-6 py-2.5 text-[0.75rem] font-medium uppercase tracking-[0.18em] text-champagne transition-all duration-300 hover:border-gold hover:bg-gold hover:text-midnight xl:inline-flex"
             >
               Reserve Your Journey
               <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
@@ -160,13 +160,12 @@ export function Nav() {
             aria-label="Menu"
           >
             <div className="flex items-center justify-between px-5 py-5">
-              <span className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center border border-gold/60 font-serif text-xl font-medium text-gold">
-                  K
-                </span>
-                <span className="font-serif text-[1.35rem] font-medium text-ivory">
-                  Karen Adventures<span className="text-gold">.</span>
-                </span>
+              <span className="flex items-center">
+                <Image
+                  {...LOGO}
+                  className="h-14 w-auto object-contain"
+                  alt={LOGO.alt}
+                />
               </span>
               <button
                 ref={closeButtonRef}

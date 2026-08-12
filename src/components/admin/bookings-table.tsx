@@ -33,7 +33,13 @@ const fmtDate = (iso: string | null) =>
       }).format(new Date(iso))
     : "Flexible";
 
-export function BookingsTable({ bookings }: { bookings: BookingRow[] }) {
+export function BookingsTable({
+  bookings,
+  usdToKesRate = 130,
+}: {
+  bookings: BookingRow[];
+  usdToKesRate?: number;
+}) {
   const router = useRouter();
   const [savingId, setSavingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -142,7 +148,7 @@ export function BookingsTable({ bookings }: { bookings: BookingRow[] }) {
             <Field label="Start date">{fmtDate(b.startDate)}</Field>
             <Field label="Estimate (USD)">{formatPrice(b.priceEstimate)}</Field>
             <Field label="Estimate (KES)">
-              KES {Math.round(b.priceEstimate * 130).toLocaleString("en-KE")}
+              KES {Math.round(b.priceEstimate * usdToKesRate).toLocaleString("en-KE")}
             </Field>
           </div>
 

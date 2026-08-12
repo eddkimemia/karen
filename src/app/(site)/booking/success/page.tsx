@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/utils";
+import { sendBookingConfirmation } from "@/lib/email";
 import { WhatsAppIcon } from "@/components/whatsapp-icon";
 import {
   paystackSecretKey,
@@ -115,6 +116,8 @@ export default async function BookingSuccessPage({
           where: { id: booking.id },
           data: { status: "confirmed" },
         });
+        // Email the guest their confirmation (never blocks the page).
+        await sendBookingConfirmation(booking);
       } else {
         verifyError = v.data?.gateway_response ?? null;
       }

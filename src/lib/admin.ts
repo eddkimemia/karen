@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { createHash } from "crypto";
+import { createHash, timingSafeEqual } from "crypto";
 
 export const ADMIN_COOKIE = "karen_admin_session";
 
@@ -25,7 +25,11 @@ export function adminSessionValue() {
 export async function isAdminAuthed() {
   const store = await cookies();
   const token = store.get(ADMIN_COOKIE)?.value;
-  if (!token) return false;
   const expected = adminSessionValue();
-  return token.length === expected.length && token === expected;
+  if (!token || token.length !== expected.length) return false;
+  try {
+    return timingSafeEqual(Buffer.from(token), Buffer.from(expected));
+  } catch {
+    return false;
+  }
 }

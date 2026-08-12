@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { AdminHeader } from "@/components/admin/ui";
+import { usdToKesRate } from "@/lib/paystack";
 import {
   BookingsTable,
   type BookingRow,
@@ -68,7 +69,7 @@ export default async function AdminBookingsPage({
         ))}
       </div>
 
-      <BookingsTable bookings={bookings} />
+      <BookingsTable bookings={bookings} usdToKesRate={usdToKesRate()} />
     </>
   );
 }

@@ -93,7 +93,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       {/* Content */}
       <div className="min-w-0 flex-1">
-        <div className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8 lg:py-12">
+        <div className="mx-auto w-full max-w-6xl px-5 py-10 pb-28 sm:px-8 lg:py-12 lg:pb-12">
           {children}
         </div>
       </div>

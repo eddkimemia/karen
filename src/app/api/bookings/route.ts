@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { notifyNewBooking } from "@/lib/email";
 import {
   appUrl,
   depositPercent,
@@ -65,45 +66,85 @@ export async function POST(req: Request) {
 
   // Estimate is the total journey cost in USD (per-person × travelers).
   const priceEstimate = adventure ? adventure.startingPrice * travelers : 0;
-  const reference = makeReference();
+  let reference = makeReference();
+
+  // Build the record once; retry with a fresh reference on the (rare) collision.
+  const record = () => ({
+    reference,
+    name,
+    email,
+    phone,
+    adventureSlug: adventure?.slug ?? null,
+    adventureTitle:
+      adventure?.title ??
+      (destination ? `${destination} — custom journey` : "Custom journey"),
+    destination: adventure?.location ?? destination,
+    travelers,
+    startDate,
+    priceEstimate,
+    status: "pending" as const,
+    notes,
+  });
 
   let booking: {
     id: string;
     reference: string;
-    priceEstimate: number;
     adventureTitle: string;
-  };
-  try {
-    booking = await prisma.booking.create({
-      data: {
-        reference,
-        name,
-        email,
-        phone,
-        adventureSlug: adventure?.slug ?? null,
-        adventureTitle:
-          adventure?.title ??
-          (destination ? `${destination} — custom journey` : "Custom journey"),
-        destination: adventure?.location ?? destination,
-        travelers,
-        startDate,
-        priceEstimate,
-        status: "pending",
-        notes,
-      },
-      select: {
-        id: true,
-        reference: true,
-        priceEstimate: true,
-        adventureTitle: true,
-      },
-    });
-  } catch {
+    name: string;
+    email: string;
+    phone: string | null;
+    destination: string | null;
+    travelers: number;
+    startDate: Date | null;
+    priceEstimate: number;
+    status: string;
+    notes: string | null;
+  } | null = null;
+
+  for (let attempt = 0; attempt < 3 && !booking; attempt++) {
+    try {
+      booking = await prisma.booking.create({
+        data: record(),
+        select: {
+          id: true,
+          reference: true,
+          adventureTitle: true,
+          name: true,
+          email: true,
+          phone: true,
+          destination: true,
+          travelers: true,
+          startDate: true,
+          priceEstimate: true,
+          status: true,
+          notes: true,
+        },
+      });
+    } catch (err) {
+      const isCollision =
+        err instanceof Error &&
+        "code" in err &&
+        (err as { code?: string }).code === "P2002";
+      if (!isCollision) {
+        return NextResponse.json(
+          { error: "We couldn't save your booking right now — please try again." },
+          { status: 500 },
+        );
+      }
+      // Unique constraint on reference — regenerate and retry.
+      reference = makeReference();
+    }
+  }
+
+  if (!booking) {
     return NextResponse.json(
       { error: "We couldn't save your booking right now — please try again." },
       { status: 500 },
     );
   }
+
+  // Notify the team about the new reservation (never blocks the response).
+  await notifyNewBooking(booking);
 
   // If Paystack is configured and there's an amount, collect a deposit now.
   if (paystackSecretKey() && priceEstimate > 0) {

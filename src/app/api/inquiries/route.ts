@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { notifyNewInquiry } from "@/lib/email";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const clean = (v: unknown) => (typeof v === "string" ? v.trim() : "");
@@ -47,8 +48,20 @@ export async function POST(req: Request) {
         travelDate,
         message,
       },
-      select: { id: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        destination: true,
+        tripType: true,
+        travelers: true,
+        travelDate: true,
+        message: true,
+      },
     });
+    // Notify the team (never blocks the response on mail issues).
+    await notifyNewInquiry(inquiry);
     return NextResponse.json({ ok: true, id: inquiry.id }, { status: 201 });
   } catch {
     return NextResponse.json(
