@@ -23,8 +23,16 @@ const inter = Inter({
   display: "swap",
 });
 
+// Social scrapers need an absolute OG URL. On Vercel the production URL is
+// injected at build time — use it when available, else the custom domain.
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "https://karenadventures.com");
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://karenadventures.com"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Karen Adventures — Discover East Africa. Beyond the Ordinary.",
     template: "%s · Karen Adventures",

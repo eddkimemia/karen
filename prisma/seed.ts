@@ -433,7 +433,7 @@ type SeedDestination = {
   images?: string[]; // optional extra gallery (first = hero)
 };
 
-const destinations: SeedDestination[] = [
+export const destinations: SeedDestination[] = [
   {
     slug: "nairobi",
     name: "Nairobi",
