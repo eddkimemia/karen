@@ -71,7 +71,12 @@ export default async function DestinationsPage() {
                       {d.country}
                     </span>
                     <h2 className="absolute bottom-4 left-4 font-serif text-3xl font-medium text-ivory">
-                      {d.name}
+                      <Link
+                        href={`/destinations/${d.slug}`}
+                        className="transition-colors duration-300 hover:text-champagne"
+                      >
+                        {d.name}
+                      </Link>
                     </h2>
                   </div>
 
@@ -104,6 +109,16 @@ export default async function DestinationsPage() {
                           {b}
                         </span>
                       ))}
+                    </div>
+
+                    <div className="mt-5">
+                      <Link
+                        href={`/destinations/${d.slug}`}
+                        className="inline-flex items-center gap-2 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-gold transition-colors hover:text-midnight"
+                      >
+                        View destination
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
                     </div>
 
                     <div className="mt-auto space-y-2.5 border-t border-midnight/10 pt-5">
