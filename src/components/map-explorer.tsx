@@ -12,12 +12,14 @@ export type DestinationProp = {
   slug: string;
   name: string;
   region: string;
+  country: string;
   description: string;
   image: string;
   imageAlt: string;
   latitude: number;
   longitude: number;
   bestExperiences: string[];
+  images: string[];
   recommendedTrips: { slug: string; title: string }[];
   /** slugified adventure region of the first recommended trip (for filtering) */
   journeyRegion: string | null;
@@ -121,14 +123,27 @@ export function MapExplorer({ destinations }: { destinations: DestinationProp[] 
                   stroke="rgba(201,162,39,0.12)"
                   strokeWidth={0.3}
                 />
-                <g opacity={0.16}>
+                {/* Country outlines — bold, gold, with a soft glow */}
+                <defs>
+                  <filter id="outlineGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow
+                      dx="0"
+                      dy="0"
+                      stdDeviation="0.55"
+                      floodColor="#c9a227"
+                      floodOpacity="0.65"
+                    />
+                  </filter>
+                </defs>
+                <g filter="url(#outlineGlow)">
                   {EAST_AFRICA_OUTLINE.map((c) => (
                     <path
                       key={c.name}
                       d={c.d}
-                      fill="rgba(201,162,39,0.16)"
-                      stroke="rgba(232,215,168,0.7)"
-                      strokeWidth={0.12}
+                      fill="rgba(201,162,39,0.22)"
+                      stroke="rgba(232,215,168,0.95)"
+                      strokeWidth={0.5}
+                      strokeLinejoin="round"
                       vectorEffect="non-scaling-stroke"
                     />
                   ))}
@@ -138,9 +153,13 @@ export function MapExplorer({ destinations }: { destinations: DestinationProp[] 
                     key={l.text}
                     x={l.x}
                     y={l.y}
-                    fontSize={2.4}
+                    fontSize={2.6}
                     letterSpacing={0.7}
-                    fill="rgba(248,245,237,0.22)"
+                    fill="rgba(248,245,237,0.5)"
+                    stroke="rgba(7,26,51,0.65)"
+                    strokeWidth={0.3}
+                    paintOrder="stroke"
+                    style={{ fontWeight: 600 }}
                     fontFamily="var(--font-inter)"
                   >
                     {l.text}
@@ -237,7 +256,7 @@ export function MapExplorer({ destinations }: { destinations: DestinationProp[] 
                     <div className="absolute inset-0 bg-gradient-to-t from-midnight via-midnight/20 to-transparent" />
                     <div className="img-frame absolute inset-0" />
                     <span className="absolute left-5 top-5 border border-champagne/40 bg-midnight/50 px-3 py-1.5 text-[0.625rem] font-medium uppercase tracking-[0.28em] text-champagne backdrop-blur-sm">
-                      {selected.region}
+                      {selected.region} · {selected.country}
                     </span>
                     <button
                       type="button"
@@ -256,6 +275,21 @@ export function MapExplorer({ destinations }: { destinations: DestinationProp[] 
                     <p className="text-sm leading-relaxed text-ivory/70">
                       {selected.description}
                     </p>
+
+                    {selected.images.length > 1 && (
+                      <div className="mt-5 grid grid-cols-3 gap-2">
+                        {selected.images.slice(1, 4).map((id, i) => (
+                          <Image
+                            key={`${id}-${i}`}
+                            src={img(id, 400, 60)}
+                            alt={`${selected.name} — gallery ${i + 2}`}
+                            width={400}
+                            height={240}
+                            className="aspect-[5/3] w-full border border-ivory/10 object-cover transition-transform duration-500 hover:scale-[1.03]"
+                          />
+                        ))}
+                      </div>
+                    )}
 
                     <div className="mt-7">
                       <h4 className="text-[0.625rem] font-medium uppercase tracking-[0.32em] text-gold">

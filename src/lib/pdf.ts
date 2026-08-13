@@ -54,17 +54,19 @@ const fmtDate = (d: Date | null | undefined) =>
     : "Flexible — to be agreed";
 
 /** Human status label for the spec: Pending / Confirmed / Paid / Cancelled. */
-const statusLabel = (s: string) => {
-  switch (s) {
-    case "confirmed":
-      return "CONFIRMED · DEPOSIT PAID";
-    case "completed":
-      return "COMPLETED";
-    case "cancelled":
-      return "CANCELLED";
-    default:
-      return "PENDING";
-  }
+const statusLabel = (s: string, depositPaid: number) => {
+  if (s === "cancelled") return "CANCELLED";
+  if (s === "completed") return "COMPLETED";
+  if (depositPaid > 0) return s === "confirmed" ? "CONFIRMED · PAID" : "PAID";
+  return s === "confirmed" ? "CONFIRMED" : "PENDING";
+};
+
+/** Fill/ink colors for the status pill (gold when settled, muted when pending). */
+const statusPillColors = (s: string, depositPaid: number) => {
+  if (s === "cancelled") return { fill: "#9d3a34", ink: "#f8f5ed" };
+  if (s === "completed" || s === "confirmed" || depositPaid > 0)
+    return { fill: GOLD, ink: NAVY };
+  return { fill: "#e3dcc8", ink: NAVY_SOFT };
 };
 
 const fmtKes = (n: number) =>
@@ -369,7 +371,30 @@ export async function buildBookingPdf(b: BookingPdfSource): Promise<Buffer> {
     label(M + 20 + colW, y + 16, "Primary destination");
     value(M + 20 + colW, y + 16, primaryDestination);
     label(M + 20 + colW * 2, y + 16, "Status");
-    value(M + 20 + colW * 2, y + 16, statusLabel(b.status));
+    // Status pill — color-coded, centered under the label.
+    const statusText = statusLabel(b.status, depositPaidKes);
+    const { fill: statusFill, ink: statusInk } = statusPillColors(
+      b.status,
+      depositPaidKes,
+    );
+    const pillW = doc
+      .font("Helvetica-Bold")
+      .fontSize(7.5)
+      .widthOfString(statusText) + 16;
+    const pillH = 14;
+    const pillY = y + 31;
+    doc
+      .roundedRect(M + 20 + colW * 2, pillY, pillW, pillH, 7)
+      .fill(statusFill);
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(7.5)
+      .fillColor(statusInk)
+      .text(statusText, M + 20 + colW * 2 + 8, pillY + 3.5, {
+        width: pillW - 16,
+        align: "center",
+        characterSpacing: 0.6,
+      });
 
     // Second row: travelers breakdown + dates
     label(M + 20, y + 46, "Travelers");

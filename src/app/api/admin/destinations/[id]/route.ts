@@ -55,6 +55,10 @@ export async function PATCH(
     }
     data.region = region;
   }
+  if (b.country !== undefined) {
+    const country = clean(b.country, 80) || "Kenya";
+    data.country = country;
+  }
   if (b.description !== undefined) {
     const description = clean(b.description, 2000);
     if (description.length < 10) {

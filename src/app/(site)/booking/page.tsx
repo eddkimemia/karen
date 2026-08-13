@@ -52,7 +52,7 @@ export default async function BookingPage({
     }),
     prisma.destination.findMany({
       orderBy: { name: "asc" },
-      select: { slug: true, name: true },
+      select: { slug: true, name: true, country: true },
     }),
   ]);
 
@@ -162,6 +162,7 @@ export default async function BookingPage({
                 destinations={destinations.map((d) => ({
                   value: d.slug,
                   label: d.name,
+                  country: d.country || "Kenya",
                 }))}
                 preselectedJourney={preselected}
                 depositPercent={depositPercent()}

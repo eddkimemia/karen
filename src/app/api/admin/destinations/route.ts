@@ -63,6 +63,7 @@ export async function POST(req: Request) {
   const b = (body ?? {}) as Record<string, unknown>;
   const name = clean(b.name, 120);
   const region = clean(b.region, 120);
+  const country = clean(b.country, 80) || "Kenya";
   const description = clean(b.description, 2000);
   const image = clean(b.image, 200);
   const imageAlt = clean(b.imageAlt, 200);
@@ -107,6 +108,7 @@ export async function POST(req: Request) {
         slug,
         name,
         region,
+        country,
         description,
         image: gallery[0] ?? image,
         imageAlt,

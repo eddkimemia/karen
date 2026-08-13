@@ -19,6 +19,7 @@ export type DestinationRow = {
   slug: string;
   name: string;
   region: string;
+  country: string;
   description: string;
   image: string;
   imageAlt: string;
@@ -37,10 +38,25 @@ const inputClass =
 const labelClass =
   "mb-1.5 block text-[0.5625rem] font-medium uppercase tracking-[0.25em] text-gold/70";
 
+const COUNTRY_OPTIONS = [
+  "Kenya",
+  "Tanzania",
+  "Uganda",
+  "Rwanda",
+  "Burundi",
+  "Ethiopia",
+  "South Sudan",
+  "DRC",
+  "Djibouti",
+  "Somalia",
+  "Eritrea",
+];
+
 type FormState = {
   slug: string;
   name: string;
   region: string;
+  country: string;
   description: string;
   image: string;
   imageAlt: string;
@@ -55,6 +71,7 @@ const emptyForm = (): FormState => ({
   slug: "",
   name: "",
   region: "",
+  country: "Kenya",
   description: "",
   image: "",
   imageAlt: "",
@@ -69,6 +86,7 @@ const toForm = (d: DestinationRow): FormState => ({
   slug: d.slug,
   name: d.name,
   region: d.region,
+  country: d.country || "Kenya",
   description: d.description,
   image: d.image,
   imageAlt: d.imageAlt,
@@ -237,7 +255,7 @@ export function DestinationsManager({
                   <div className="absolute inset-0 bg-gradient-to-t from-midnight/90 via-midnight/10 to-transparent" />
                   <div className="absolute bottom-3 left-4 right-4">
                     <p className="text-[0.5625rem] font-medium uppercase tracking-[0.25em] text-gold/80">
-                      {d.region}
+                      {d.region} · {d.country}
                     </p>
                     <h3 className="font-serif text-2xl font-medium text-ivory">
                       {d.name}
@@ -320,6 +338,24 @@ export function DestinationsManager({
                   onChange={(e) => set("region", e.target.value)}
                   placeholder="e.g. The Rift Valley"
                 />
+              </div>
+
+              <div>
+                <label className={labelClass} htmlFor="d-country">
+                  Country
+                </label>
+                <select
+                  id="d-country"
+                  className={`${inputClass} appearance-none`}
+                  value={form.country}
+                  onChange={(e) => set("country", e.target.value)}
+                >
+                  {COUNTRY_OPTIONS.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>

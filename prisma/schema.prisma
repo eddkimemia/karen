@@ -41,12 +41,13 @@ model Adventure {
   @@index([tripType])
 }
 
-/// A Kenyan destination on the Explorer map.
+/// A destination on the Explorer map (East Africa).
 model Destination {
   id              String   @id @default(cuid())
   slug            String   @unique
   name            String
   region          String
+  country         String   @default("Kenya")
   description     String
   image           String
   imageAlt        String

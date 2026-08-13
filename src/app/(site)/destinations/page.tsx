@@ -67,10 +67,28 @@ export default async function DestinationsPage() {
                       <MapPin className="h-3 w-3 text-gold" />
                       {d.region}
                     </p>
+                    <span className="absolute right-4 top-4 border border-champagne/40 bg-midnight/40 px-2.5 py-1 text-[0.5625rem] font-medium uppercase tracking-[0.26em] text-champagne backdrop-blur-sm">
+                      {d.country}
+                    </span>
                     <h2 className="absolute bottom-4 left-4 font-serif text-3xl font-medium text-ivory">
                       {d.name}
                     </h2>
                   </div>
+
+                  {d.images.length > 1 && (
+                    <div className="grid grid-cols-3 gap-1 p-1">
+                      {d.images.slice(1, 4).map((id, i) => (
+                        <Image
+                          key={`${id}-${i}`}
+                          src={img(id, 300, 55)}
+                          alt={`${d.name} — gallery ${i + 2}`}
+                          width={300}
+                          height={180}
+                          className="aspect-[5/3] w-full object-cover transition-transform duration-500 hover:scale-[1.04]"
+                        />
+                      ))}
+                    </div>
+                  )}
 
                   <div className="flex flex-1 flex-col p-6">
                     <p className="text-sm leading-relaxed text-midnight/65">

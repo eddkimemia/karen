@@ -1,21 +1,40 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
+  Check,
   CheckCircle2,
+  ChevronDown,
   Loader2,
   Lock,
+  Search,
   ShieldCheck,
+  X,
 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { cn, formatPrice } from "@/lib/utils";
 import { WhatsAppIcon } from "@/components/whatsapp-icon";
 import { whatsappLink } from "@/lib/site";
 
 type Journey = { value: string; label: string; price: number };
-type Destination = { value: string; label: string };
+type Destination = { value: string; label: string; country: string };
 
 const DESTINATION_LIMIT = 8;
+
+const COUNTRY_ORDER = [
+  "Kenya",
+  "Tanzania",
+  "Uganda",
+  "Rwanda",
+  "Burundi",
+  "Ethiopia",
+  "South Sudan",
+  "DRC",
+  "Djibouti",
+  "Somalia",
+  "Eritrea",
+];
 
 type Props = {
   journeys: Journey[];
@@ -49,6 +68,51 @@ export function BookingForm({
   const [children, setChildren] = useState(0);
   const travelers = Math.max(1, adults + children);
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
+  const [destOpen, setDestOpen] = useState(false);
+  const [destQuery, setDestQuery] = useState("");
+  const destRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!destOpen) return;
+    const onPointer = (e: MouseEvent | TouchEvent) => {
+      if (destRef.current && !destRef.current.contains(e.target as Node)) {
+        setDestOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDestOpen(false);
+    };
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("touchstart", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("touchstart", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [destOpen]);
+
+  const grouped = useMemo(() => {
+    const q = destQuery.trim().toLowerCase();
+    const list = destinations.filter(
+      (d) =>
+        !q ||
+        d.label.toLowerCase().includes(q) ||
+        d.country.toLowerCase().includes(q),
+    );
+    const groups = new Map<string, Destination[]>();
+    for (const d of list) {
+      const country = d.country || "Other";
+      if (!groups.has(country)) groups.set(country, []);
+      groups.get(country)!.push(d);
+    }
+    return [...groups.entries()].sort((a, b) => {
+      const ia = COUNTRY_ORDER.indexOf(a[0]);
+      const ib = COUNTRY_ORDER.indexOf(b[0]);
+      return (ia === -1 ? COUNTRY_ORDER.length : ia) -
+        (ib === -1 ? COUNTRY_ORDER.length : ib);
+    });
+  }, [destinations, destQuery]);
 
   const ACCOMMODATION_OPTIONS = [
     "Safari lodge",
@@ -184,41 +248,186 @@ export function BookingForm({
         </div>
 
         <div className="sm:col-span-2">
-          <label className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55">
+          <label
+            htmlFor="destinations-trigger"
+            className="mb-2 block text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-midnight/55"
+          >
             Destinations{" "}
             <span className="font-sans text-[0.625rem] normal-case tracking-normal text-midnight/40">
               (choose one or more)
             </span>
           </label>
-          <div className="flex flex-wrap gap-2">
-            {destinations.map((d) => {
-              const active = selectedDestinations.includes(d.label);
-              return (
-                <button
-                  key={d.value}
-                  type="button"
-                  onClick={() => toggleDestination(d.label)}
-                  aria-pressed={active}
-                  className={cn(
-                    "border px-3.5 py-2 text-xs font-medium transition-all duration-200",
-                    active
-                      ? "border-gold bg-gold/15 text-midnight"
-                      : "border-midnight/15 bg-white text-midnight/60 hover:border-gold/60 hover:text-midnight",
-                  )}
+
+          <div ref={destRef} className="relative">
+            <button
+              id="destinations-trigger"
+              type="button"
+              onClick={() => {
+                setDestOpen((o) => !o);
+                setDestQuery("");
+              }}
+              aria-expanded={destOpen}
+              aria-haspopup="listbox"
+              className={cn(
+                inputClass,
+                "flex items-center justify-between gap-3 text-left",
+              )}
+            >
+              <span
+                className={cn(
+                  "truncate",
+                  selectedDestinations.length === 0 && "text-midnight/35",
+                )}
+              >
+                {selectedDestinations.length === 0
+                  ? "Select your destinations"
+                  : `${selectedDestinations.length} ${
+                      selectedDestinations.length === 1
+                        ? "destination"
+                        : "destinations"
+                    } selected${
+                      selectedDestinations.length >= DESTINATION_LIMIT
+                        ? " (max reached)"
+                        : ""
+                    }`}
+              </span>
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 shrink-0 text-gold transition-transform duration-300",
+                  destOpen && "rotate-180",
+                )}
+              />
+            </button>
+
+            <AnimatePresence>
+              {destOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.18 }}
+                  role="listbox"
+                  aria-label="Destinations"
+                  className="absolute left-0 right-0 top-full z-30 mt-2 border border-gold/40 bg-white shadow-[0_30px_60px_-20px_rgba(7,26,51,0.35)]"
                 >
-                  {d.label}
-                </button>
-              );
-            })}
+                  <div className="relative border-b border-midnight/10">
+                    <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-midnight/35" />
+                    <input
+                      type="search"
+                      value={destQuery}
+                      onChange={(e) => setDestQuery(e.target.value)}
+                      placeholder="Search by destination or country…"
+                      className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm text-midnight placeholder:text-midnight/35 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="max-h-72 overflow-y-auto overscroll-contain">
+                    {grouped.length === 0 ? (
+                      <p className="px-5 py-6 text-center text-sm text-midnight/45">
+                        No destinations match — we can design around your dream
+                        anyway.
+                      </p>
+                    ) : (
+                      grouped.map(([country, items]) => (
+                        <div key={country}>
+                          <p className="sticky top-0 z-10 border-y border-midnight/5 bg-sand/95 px-5 py-2 text-[0.5625rem] font-medium uppercase tracking-[0.28em] text-midnight/50 backdrop-blur-sm">
+                            {country}
+                            <span className="ml-2 normal-case tracking-normal text-midnight/35">
+                              {items.length}
+                            </span>
+                          </p>
+                          <ul>
+                            {items.map((d) => {
+                              const active = selectedDestinations.includes(d.label);
+                              const disabled =
+                                !active &&
+                                selectedDestinations.length >= DESTINATION_LIMIT;
+                              return (
+                                <li key={d.value}>
+                                  <button
+                                    type="button"
+                                    role="option"
+                                    aria-selected={active}
+                                    disabled={disabled}
+                                    onClick={() => toggleDestination(d.label)}
+                                    className={cn(
+                                      "flex w-full items-center gap-3 px-5 py-2.5 text-left text-sm transition-colors",
+                                      active
+                                        ? "bg-gold/10 text-midnight"
+                                        : "text-midnight/70 hover:bg-sand/70",
+                                      disabled && "cursor-not-allowed opacity-40",
+                                    )}
+                                  >
+                                    <span
+                                      className={cn(
+                                        "flex h-[18px] w-[18px] shrink-0 items-center justify-center border transition-colors",
+                                        active
+                                          ? "border-gold bg-gold text-midnight"
+                                          : "border-midnight/25",
+                                      )}
+                                    >
+                                      {active && <Check className="h-3 w-3" />}
+                                    </span>
+                                    <span className="flex-1 truncate">
+                                      {d.label}
+                                    </span>
+                                    {active && (
+                                      <span className="text-[0.625rem] uppercase tracking-[0.18em] text-gold">
+                                        Selected
+                                      </span>
+                                    )}
+                                  </button>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between border-t border-midnight/10 bg-ivory px-5 py-3">
+                    <p className="text-[0.6875rem] text-midnight/50">
+                      Up to {DESTINATION_LIMIT} destinations · or leave empty
+                      for a surprise
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setDestOpen(false)}
+                      className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-midnight/70 transition-colors hover:text-gold"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
+
+          {selectedDestinations.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {selectedDestinations.map((label) => (
+                <span
+                  key={label}
+                  className="inline-flex items-center gap-1.5 border border-gold/50 bg-gold/10 px-3 py-1.5 text-xs font-medium text-midnight"
+                >
+                  {label}
+                  <button
+                    type="button"
+                    aria-label={`Remove ${label}`}
+                    onClick={() => toggleDestination(label)}
+                    className="text-midnight/50 transition-colors hover:text-midnight"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
           <p className="mt-2 text-[0.6875rem] text-midnight/45">
             {selectedDestinations.length === 0
               ? "Anywhere in East Africa — tell us your dream and we'll plan around it."
-              : `${selectedDestinations.length} selected${
-                  selectedDestinations.length >= DESTINATION_LIMIT
-                    ? ` (max ${DESTINATION_LIMIT})`
-                    : ""
-                } — pick up to ${DESTINATION_LIMIT} locations.`}
+              : "Choose as many as you like — each one becomes a chapter of your journey."}
           </p>
         </div>
 

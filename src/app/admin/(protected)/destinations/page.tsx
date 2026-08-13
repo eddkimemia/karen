@@ -23,6 +23,7 @@ export default async function AdminDestinationsPage() {
     slug: d.slug,
     name: d.name,
     region: d.region,
+    country: d.country || "Kenya",
     description: d.description,
     image: d.image,
     imageAlt: d.imageAlt,

@@ -2360,6 +2360,55 @@ const gallery = [
 
 /* ------------------------------------------------- destination galleries */
 // A second photo for popular destinations so invoices can show two images.
+/* ------------------------------------------------- destination countries */
+// Seed destinations outside Kenya — everything else defaults to Kenya.
+const DEST_COUNTRY: Record<string, string> = {
+  // Tanzania
+  "kilimanjaro": "Tanzania",
+  "serengeti": "Tanzania",
+  "ngorongoro": "Tanzania",
+  "zanzibar": "Tanzania",
+  "lake-manyara": "Tanzania",
+  "tarangire": "Tanzania",
+  "arusha": "Tanzania",
+  "ruaha": "Tanzania",
+  "nyerere-selous": "Tanzania",
+  "gombe": "Tanzania",
+  "lake-natron": "Tanzania",
+  "pemba": "Tanzania",
+  // Uganda
+  "bwindi": "Uganda",
+  "murchison-falls": "Uganda",
+  "queen-elizabeth": "Uganda",
+  "kibale": "Uganda",
+  "rwenzori": "Uganda",
+  "jinja": "Uganda",
+  "kidepo": "Uganda",
+  "entebbe": "Uganda",
+  "lake-bunyonyi": "Uganda",
+  // Rwanda
+  "volcanoes": "Rwanda",
+  "nyungwe": "Rwanda",
+  "akagera": "Rwanda",
+  "lake-kivu": "Rwanda",
+  "kigali": "Rwanda",
+  // Burundi
+  "rusizi": "Burundi",
+  "kibira": "Burundi",
+  "bujumbura": "Burundi",
+  // Ethiopia
+  "addis-ababa": "Ethiopia",
+  "lalibela": "Ethiopia",
+  "simien": "Ethiopia",
+  "danakil": "Ethiopia",
+  "omo-valley": "Ethiopia",
+  "gondar": "Ethiopia",
+  "bale": "Ethiopia",
+  // DRC / South Sudan
+  "virunga": "DRC",
+  "boma": "South Sudan",
+};
+
 const DEST_SECONDARY_IMAGE: Record<string, string> = {
   "maasai-mara": "1500382017468-9049fed747ef", // savannah sunset
   "the-coast": "1519046904884-53103b34b206", // beach
@@ -2596,6 +2645,7 @@ async function seedWith(prisma: PrismaClient) {
   // Destinations (connect recommended trips after both exist).
   for (const d of destinations) {
     const { trips, ...data } = d;
+    const country = DEST_COUNTRY[d.slug] ?? "Kenya";
     const tripsToLink = await prisma.adventure.findMany({
       where: { slug: { in: trips } },
       select: { id: true },
@@ -2611,12 +2661,14 @@ async function seedWith(prisma: PrismaClient) {
       update: force
         ? {
             ...data,
+            country,
             images: gallery,
             recommendedTrips: { set: tripsToLink.map((t) => ({ id: t.id })) },
           }
         : {},
       create: {
         ...data,
+        country,
         images: gallery,
         recommendedTrips: { connect: tripsToLink.map((t) => ({ id: t.id })) },
       },
