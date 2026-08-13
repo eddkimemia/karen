@@ -10,7 +10,24 @@ import { defineConfig } from "prisma/config";
  * `prisma migrate deploy` and `prisma db seed` work in the build without
  * a manually-added DATABASE_URL. Local development keeps using DATABASE_URL
  * from .env (loaded via dotenv above).
+ *
+ * IMPORTANT: an empty-string DATABASE_URL fails schema validation (P1012)
+ * even though this config provides a datasource.url override — Prisma only
+ * falls through to the override when the var is UNSET. Normalizing the env
+ * var below (empty string treated as missing) keeps the build green no
+ * matter how Vercel's build environment is wired.
  */
+const dbUrl =
+  process.env.DATABASE_URL ||
+  process.env.PRISMA_DATABASE_URL ||
+  process.env.POSTGRES_PRISMA_URL ||
+  process.env.POSTGRES_URL_NON_POOLING ||
+  process.env.POSTGRES_URL;
+if (dbUrl) process.env.DATABASE_URL = dbUrl;
+
+const directUrl = process.env.DIRECT_URL || process.env.POSTGRES_URL_NON_POOLING;
+if (directUrl) process.env.DIRECT_URL = directUrl;
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
@@ -18,17 +35,8 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url:
-      process.env.DATABASE_URL ??
-      process.env.PRISMA_DATABASE_URL ??
-      process.env.POSTGRES_PRISMA_URL ??
-      process.env.POSTGRES_URL_NON_POOLING ??
-      process.env.POSTGRES_URL ??
-      "",
+    url: process.env.DATABASE_URL || "",
     // Migrations prefer a direct (non-pooled) connection when one exists.
-    directUrl:
-      process.env.DIRECT_URL ??
-      process.env.POSTGRES_URL_NON_POOLING ??
-      undefined,
+    directUrl: process.env.DIRECT_URL || undefined,
   },
 });
