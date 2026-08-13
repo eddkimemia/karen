@@ -53,7 +53,7 @@ export function ExperiencesSection({ experiences }: Props) {
               Travel, <Em>Reimagined.</Em>
             </>
           }
-          description="Six ways of experiencing Kenya — each one designed around you, your pace, and the story you want to tell."
+          description="Six ways of experiencing East Africa — each one designed around you, your pace, and the story you want to tell."
         />
 
         <div className="mt-16 grid gap-px overflow-hidden border border-ivory/10 bg-ivory/10 sm:grid-cols-2 lg:grid-cols-3">

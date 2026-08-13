@@ -98,7 +98,7 @@ export default async function ExperiencesPage() {
             <em className="font-serif italic text-gold">Perfected.</em>
           </>
         }
-        description="Six ways of experiencing Kenya, each one designed around you — your dates, your pace, and the story you want to tell."
+        description="Six ways of experiencing East Africa, each one designed around you — your dates, your pace, and the story you want to tell."
         image="1500382017468-9049fed747ef"
         imageAlt="Golden light across the savannah at dusk"
         align="center"

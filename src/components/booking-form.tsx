@@ -213,7 +213,7 @@ export function BookingForm({
           </div>
           <p className="mt-2 text-[0.6875rem] text-midnight/45">
             {selectedDestinations.length === 0
-              ? "Anywhere in Kenya — tell us your dream and we'll plan around it."
+              ? "Anywhere in East Africa — tell us your dream and we'll plan around it."
               : `${selectedDestinations.length} selected${
                   selectedDestinations.length >= DESTINATION_LIMIT
                     ? ` (max ${DESTINATION_LIMIT})`

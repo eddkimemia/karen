@@ -78,7 +78,7 @@ function loadLogo(): Buffer | null {
   ];
   for (const p of candidates) {
     try {
-      return fs.readFileSync(p);
+      return fs.readFileSync(/* turbopackIgnore: true */ p);
     } catch {
       /* keep trying */
     }
@@ -167,7 +167,7 @@ export async function buildBookingPdf(b: BookingPdfSource): Promise<Buffer> {
     secondaryUrl ? fetchImageBuffer(secondaryUrl) : Promise.resolve(null),
   ]);
 
-  const primaryDestination = b.destinations[0] ?? b.destination ?? "Kenya";
+  const primaryDestination = b.destinations[0] ?? b.destination ?? "East Africa";
   const destinationList = b.destinations.length
     ? b.destinations
     : b.destination
@@ -242,7 +242,7 @@ export async function buildBookingPdf(b: BookingPdfSource): Promise<Buffer> {
       .font("Helvetica")
       .fontSize(8)
       .fillColor(GOLD_SOFT)
-      .text("DISCOVER KENYA · BEYOND THE ORDINARY", M + 2, 100, {
+      .text("EAST AFRICA · BEYOND THE ORDINARY", M + 2, 100, {
         characterSpacing: 2,
       });
 

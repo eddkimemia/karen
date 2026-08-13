@@ -9,7 +9,7 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "Adventures",
   description:
-    "Signature Kenyan journeys — safaris, mountain expeditions, coastal escapes and expeditions across the Great Rift Valley.",
+    "Signature East African journeys — safaris, mountain expeditions, coastal escapes and expeditions across the Great Rift Valley.",
 };
 
 export default async function AdventuresPage({
@@ -32,7 +32,7 @@ export default async function AdventuresPage({
             <em className="font-serif italic text-gold">Curated.</em>
           </>
         }
-        description="Fourteen journeys across Kenya, from one-day Nairobi experiences to a week on the jade waters of Turkana. Every one designed, guided and hosted by our team."
+        description="Fourteen journeys across East Africa, from one-day Nairobi experiences to a week on the jade waters of Turkana. Every one designed, guided and hosted by our team."
         image="1547471080-7cc2caa01a7e"
         imageAlt="A lion resting in the golden grass of the Maasai Mara"
         align="center"

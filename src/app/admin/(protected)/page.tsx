@@ -128,7 +128,7 @@ export default async function AdminDashboardPage() {
                       {q.name}
                     </p>
                     <p className="mt-0.5 text-xs text-ivory/45">
-                      {fmtDate(q.createdAt)} · {q.destination ?? "Anywhere in Kenya"}
+                      {fmtDate(q.createdAt)} · {q.destination ?? "Anywhere in East Africa"}
                     </p>
                   </div>
                   <StatusPill status={q.status} />

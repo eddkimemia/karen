@@ -135,7 +135,7 @@ function shell(title: string, body: string) {
               <p style="margin:0;color:#f8f5ed;font-size:22px;letter-spacing:0.02em;">
                 Karen Adventures<span style="color:${GOLD};">.</span>
               </p>
-              <p style="margin:6px 0 0;color:#e8d7a8;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;">Discover Kenya · Beyond the Ordinary</p>
+              <p style="margin:6px 0 0;color:#e8d7a8;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;">East Africa · Beyond the Ordinary</p>
             </td>
           </tr>
           <tr>
@@ -178,7 +178,7 @@ export async function notifyNewInquiry(i: InquiryLike) {
       ${detailRow("Name", i.name)}
       ${detailRow("Email", `<a href="mailto:${i.email}" style="color:${GOLD};">${i.email}</a>`)}
       ${detailRow("Phone", i.phone ?? "—")}
-      ${detailRow("Destination", i.destination ?? "Anywhere in Kenya")}
+      ${detailRow("Destination", i.destination ?? "Anywhere in East Africa")}
       ${detailRow("Journey", i.tripType ?? "Still deciding")}
       ${detailRow("Travelers", i.travelers ?? "—")}
       ${detailRow("Dates", i.travelDate ?? "Flexible")}
@@ -192,7 +192,7 @@ export async function notifyNewInquiry(i: InquiryLike) {
   return sendMail({
     to: teamEmail(),
     subject: `New enquiry from ${i.name}`,
-    text: `New enquiry from ${i.name} (${i.email}) — ${i.destination ?? "Anywhere in Kenya"}. ${i.message}`,
+    text: `New enquiry from ${i.name} (${i.email}) — ${i.destination ?? "Anywhere in East Africa"}. ${i.message}`,
     html: shell("A new journey enquiry", body),
   });
 }
@@ -398,7 +398,7 @@ export async function sendSubscriberWelcome(email: string) {
       "Welcome to The Dispatches",
       `<p style="margin:0;color:#444;font-size:15px;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">
         Karibu! You're on the list. Expect occasional letters from the road —
-        journeys, wildlife and the quiet corners of Kenya. No spam, ever.
+        journeys, wildlife and the quiet corners of East Africa. No spam, ever.
       </p>`,
     ),
   });

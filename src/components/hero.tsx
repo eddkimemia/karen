@@ -63,7 +63,7 @@ export function Hero() {
           transition={{ duration: 0.9, delay: 0.15, ease }}
           className="eyebrow eyebrow--center"
         >
-          Nairobi · Kenya — Private Adventures
+          Nairobi · East Africa — Private Adventures
         </motion.span>
 
         <motion.h1
@@ -72,7 +72,7 @@ export function Hero() {
           transition={{ duration: 1.05, delay: 0.35, ease }}
           className="mt-7 font-serif text-[2.9rem] leading-[1.02] font-medium text-ivory text-balance sm:text-7xl lg:text-[5.6rem]"
         >
-          Discover Kenya.
+          Discover East Africa.
           <span className="block font-serif italic text-gold">
             Beyond the Ordinary.
           </span>
@@ -85,7 +85,7 @@ export function Hero() {
           className="mt-7 max-w-xl text-base leading-relaxed text-ivory/80 sm:text-lg"
         >
           Curated adventures, unforgettable escapes, and extraordinary
-          experiences across Kenya.
+          experiences across East Africa.
         </motion.p>
 
         <motion.div

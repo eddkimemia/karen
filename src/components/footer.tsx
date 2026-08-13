@@ -66,7 +66,7 @@ export async function Footer() {
               />
             </div>
             <p className="mt-4 font-serif text-lg italic text-champagne/90">
-              Discover Kenya. Beyond the Ordinary.
+              Discover East Africa. Beyond the Ordinary.
             </p>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-ivory/55">
               A Nairobi-based house of curated travel — private safaris,

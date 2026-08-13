@@ -95,7 +95,7 @@ export default async function ContactPage({
                 <span className="eyebrow">How It Works</span>
                 <h2 className="mt-5 font-serif text-3xl font-medium text-midnight sm:text-4xl">
                   Three steps to{" "}
-                  <em className="font-serif italic text-gold">Kenya.</em>
+                  <em className="font-serif italic text-gold">East Africa.</em>
                 </h2>
                 <div className="mt-8 space-y-7">
                   {STEPS.map((s) => (

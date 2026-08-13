@@ -37,7 +37,7 @@ export default async function AdminDestinationsPage() {
     <>
       <AdminHeader
         title="Destinations"
-        description="Create and edit the places on Kenya's map — parks, lakes, mountains and the coast."
+        description="Create and edit the places on East Africa's map — parks, lakes, mountains and the coast."
       />
       <DestinationsManager
         destinations={destinations}

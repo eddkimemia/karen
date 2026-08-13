@@ -13,7 +13,7 @@ type Props = {
   }[];
 };
 
-/** "See Kenya Differently." — editorial masonry gallery on midnight. */
+/** "See East Africa Differently." — editorial masonry gallery on midnight. */
 export function Gallery({ items }: Props) {
   return (
     <section className="relative overflow-hidden bg-royal-deep py-24 sm:py-32">
@@ -24,7 +24,7 @@ export function Gallery({ items }: Props) {
           eyebrow="The Gallery"
           title={
             <>
-              See Kenya <Em>Differently.</Em>
+              See East Africa <Em>Differently.</Em>
             </>
           }
           description="Frames from the road — wildlife, mountains, campfires, coastlines and the people who make it all feel like home."

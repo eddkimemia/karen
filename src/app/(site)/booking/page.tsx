@@ -15,7 +15,7 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "Book",
   description:
-    "Reserve your Kenyan journey in minutes. Choose a journey, tell us your dates, and secure it with a Paystack deposit — M-Pesa or card.",
+    "Reserve your East African journey in minutes. Choose a journey, tell us your dates, and secure it with a Paystack deposit — M-Pesa or card.",
 };
 
 const STEPS = [
@@ -69,7 +69,7 @@ export default async function BookingPage({
           <>
             Book Your
             <br />
-            <em className="font-serif italic text-gold">Kenya.</em>
+            <em className="font-serif italic text-gold">East Africa.</em>
           </>
         }
         description="Choose a journey, tell us your dates, and secure your place with a small deposit. We handle everything after that."

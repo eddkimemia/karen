@@ -12,7 +12,7 @@ const TRUST = [
   },
   {
     title: "Local Expertise",
-    copy: "Authentic Kenya, guided by people who know it best. Our team grew up on these roads.",
+    copy: "Authentic East Africa, guided by people who know it best. Our team grew up on these roads.",
   },
   {
     title: "Seamless Planning",
@@ -52,7 +52,7 @@ export function WhyKaren() {
               />
             </div>
             <p className="absolute -bottom-6 left-0 hidden border border-gold/40 bg-midnight px-5 py-3 font-serif text-sm italic text-champagne sm:block">
-              “Kenya is not a place. It is a feeling.”
+              “East Africa is not a place. It is a feeling.”
             </p>
           </Reveal>
 

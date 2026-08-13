@@ -115,7 +115,7 @@ export function ContactForm({
             defaultValue={preselectedDestination ?? ""}
             className={cn(inputClass, "appearance-none")}
           >
-            <option value="">Anywhere in Kenya</option>
+            <option value="">Anywhere in East Africa</option>
             {destinations.map((d) => (
               <option key={d.value} value={d.value}>{d.label}</option>
             ))}

@@ -26,40 +26,46 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://karenadventures.com"),
   title: {
-    default: "Karen Adventures — Discover Kenya. Beyond the Ordinary.",
+    default: "Karen Adventures — Discover East Africa. Beyond the Ordinary.",
     template: "%s · Karen Adventures",
   },
   description:
-    "Curated adventures, unforgettable escapes, and extraordinary experiences across Kenya — private safaris, mountain expeditions, coastal escapes and luxury getaways, designed by people who know the land.",
+    "Curated adventures, unforgettable escapes, and extraordinary experiences across East Africa — private safaris, mountain expeditions, coastal escapes and luxury getaways, designed by people who know the land.",
   keywords: [
+    "East Africa safari",
     "Kenya safari",
     "luxury travel Kenya",
+    "luxury travel East Africa",
     "Maasai Mara",
+    "Serengeti",
+    "Kilimanjaro",
+    "Zanzibar",
     "Mount Kenya",
     "Karen Adventures",
     "safari",
     "Kenya adventures",
+    "Tanzania safari",
   ],
   openGraph: {
     type: "website",
     siteName: "Karen Adventures",
-    title: "Karen Adventures — Discover Kenya. Beyond the Ordinary.",
+    title: "Karen Adventures — Discover East Africa. Beyond the Ordinary.",
     description:
-      "Curated adventures, unforgettable escapes, and extraordinary experiences across Kenya.",
+      "Curated adventures, unforgettable escapes, and extraordinary experiences across East Africa.",
     images: [
       {
         url: "/images/karenimg.jpg",
         width: 1200,
         height: 630,
-        alt: "Karen Adventures — Kenya, beyond the ordinary",
+        alt: "Karen Adventures — East Africa, beyond the ordinary",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Karen Adventures — Discover Kenya. Beyond the Ordinary.",
+    title: "Karen Adventures — Discover East Africa. Beyond the Ordinary.",
     description:
-      "Curated adventures, unforgettable escapes, and extraordinary experiences across Kenya.",
+      "Curated adventures, unforgettable escapes, and extraordinary experiences across East Africa.",
     images: ["/images/karenimg.jpg"],
   },
   icons: {

@@ -139,7 +139,7 @@ export function InquiriesTable({ inquiries }: { inquiries: InquiryRow[] }) {
                 <span className="text-ivory/35">—</span>
               )}
             </Field>
-            <Field label="Destination">{q.destination ?? "Anywhere in Kenya"}</Field>
+            <Field label="Destination">{q.destination ?? "Anywhere in East Africa"}</Field>
             <Field label="Journey">{q.tripType ?? "Still deciding"}</Field>
             <Field label="Travelers">{q.travelers ?? "—"}</Field>
             <Field label="Preferred dates">{q.travelDate ?? "Flexible"}</Field>
