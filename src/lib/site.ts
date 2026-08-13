@@ -12,3 +12,27 @@ export function whatsappLink(message: string = WHATSAPP_MESSAGE) {
 
 export const CONTACT_EMAIL = "booking@karenadventures.com";
 export const CONTACT_PHONE_DISPLAY = WHATSAPP_DISPLAY;
+
+/** All social handles are @karenadventures across platforms. */
+export const SOCIALS = [
+  {
+    label: "Instagram",
+    handle: "@karenadventures",
+    href: "https://instagram.com/karenadventures",
+  },
+  {
+    label: "Facebook",
+    handle: "@karenadventures",
+    href: "https://facebook.com/karenadventures",
+  },
+  {
+    label: "YouTube",
+    handle: "@karenadventures",
+    href: "https://youtube.com/@karenadventures",
+  },
+  {
+    label: "X",
+    handle: "@karenadventures",
+    href: "https://x.com/karenadventures",
+  },
+] as const;

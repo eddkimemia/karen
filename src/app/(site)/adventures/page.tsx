@@ -32,7 +32,7 @@ export default async function AdventuresPage({
             <em className="font-serif italic text-gold">Curated.</em>
           </>
         }
-        description="Fourteen journeys across East Africa, from one-day Nairobi experiences to a week on the jade waters of Turkana. Every one designed, guided and hosted by our team."
+        description="Twenty journeys across East Africa, from one-day Nairobi experiences to a week on the jade waters of Turkana, the Serengeti plains and the roof of Ethiopia. Every one designed, guided and hosted by our team."
         image="1547471080-7cc2caa01a7e"
         imageAlt="A lion resting in the golden grass of the Maasai Mara"
         align="center"

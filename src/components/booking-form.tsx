@@ -40,6 +40,7 @@ type Props = {
   journeys: Journey[];
   destinations: Destination[];
   preselectedJourney?: string;
+  preselectedDestination?: string;
   depositPercent: number;
   usdToKesRate: number;
 };
@@ -51,6 +52,7 @@ export function BookingForm({
   journeys,
   destinations,
   preselectedJourney,
+  preselectedDestination,
   depositPercent,
   usdToKesRate,
 }: Props) {
@@ -67,7 +69,14 @@ export function BookingForm({
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const travelers = Math.max(1, adults + children);
-  const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
+  const [selectedDestinations, setSelectedDestinations] = useState<string[]>(
+    () =>
+      preselectedDestination
+        ? destinations
+            .filter((d) => d.value === preselectedDestination)
+            .map((d) => d.label)
+        : [],
+  );
   const [destOpen, setDestOpen] = useState(false);
   const [destQuery, setDestQuery] = useState("");
   const destRef = useRef<HTMLDivElement>(null);

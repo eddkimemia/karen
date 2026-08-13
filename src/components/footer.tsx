@@ -14,20 +14,20 @@ import { NewsletterForm } from "@/components/newsletter-form";
 import { whatsappLink, WHATSAPP_DISPLAY, CONTACT_EMAIL } from "@/lib/site";
 
 const NAV = [
-  { href: "/", label: "Home" },
   { href: "/adventures", label: "Adventures" },
   { href: "/destinations", label: "Destinations" },
   { href: "/experiences", label: "Experiences" },
+  { href: "/blog", label: "Journal" },
   { href: "/booking", label: "Book" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
 
 const SOCIALS = [
-  { label: "Instagram", icon: InstagramIcon, href: "#" },
-  { label: "Facebook", icon: FacebookIcon, href: "#" },
-  { label: "YouTube", icon: YoutubeIcon, href: "#" },
-  { label: "X", icon: XIcon, href: "#" },
+  { label: "Instagram", icon: InstagramIcon, href: "https://instagram.com/karenadventures" },
+  { label: "Facebook", icon: FacebookIcon, href: "https://facebook.com/karenadventures" },
+  { label: "YouTube", icon: YoutubeIcon, href: "https://youtube.com/@karenadventures" },
+  { label: "X", icon: XIcon, href: "https://x.com/karenadventures" },
   { label: "WhatsApp", icon: WhatsAppIcon, href: whatsappLink() },
 ];
 

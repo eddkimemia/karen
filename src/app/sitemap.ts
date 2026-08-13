@@ -15,19 +15,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   let adventureRoutes: MetadataRoute.Sitemap = [];
+  let blogRoutes: MetadataRoute.Sitemap = [];
   try {
-    const adventures = await prisma.adventure.findMany({
-      select: { slug: true, createdAt: true },
-    });
+    const [adventures, posts] = await Promise.all([
+      prisma.adventure.findMany({
+        select: { slug: true, createdAt: true },
+      }),
+      prisma.blogPost.findMany({
+        where: { published: true },
+        select: { slug: true, updatedAt: true },
+      }),
+    ]);
     adventureRoutes = adventures.map((a) => ({
       url: `${BASE}/adventures/${a.slug}`,
       lastModified: a.createdAt,
       changeFrequency: "monthly" as const,
       priority: 0.7,
     }));
+    blogRoutes = posts.map((p) => ({
+      url: `${BASE}/blog/${p.slug}`,
+      lastModified: p.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
   } catch {
     // DB unavailable at build time — serve static routes only.
   }
 
-  return [...staticRoutes, ...adventureRoutes];
+  return [...staticRoutes, { url: `${BASE}/blog`, changeFrequency: "weekly", priority: 0.8 }, ...adventureRoutes, ...blogRoutes];
 }

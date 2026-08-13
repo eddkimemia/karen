@@ -14,10 +14,10 @@ import {
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { href: "/", label: "Home" },
   { href: "/adventures", label: "Adventures" },
   { href: "/destinations", label: "Destinations" },
   { href: "/experiences", label: "Experiences" },
+  { href: "/blog", label: "Journal" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
@@ -222,11 +222,36 @@ export function Nav() {
                 Reserve Your Journey <ArrowRight className="h-4 w-4" />
               </Link>
               <div className="flex items-center justify-center gap-6 text-ivory/60">
-                <InstagramIcon className="h-5 w-5" />
-                <FacebookIcon className="h-5 w-5" />
-                <YoutubeIcon className="h-5 w-5" />
+                {[
+                  {
+                    label: "Instagram",
+                    href: "https://instagram.com/karenadventures",
+                    Icon: InstagramIcon,
+                  },
+                  {
+                    label: "Facebook",
+                    href: "https://facebook.com/karenadventures",
+                    Icon: FacebookIcon,
+                  },
+                  {
+                    label: "YouTube",
+                    href: "https://youtube.com/@karenadventures",
+                    Icon: YoutubeIcon,
+                  },
+                ].map(({ label, href, Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="transition-colors hover:text-gold"
+                  >
+                    <Icon className="h-5 w-5" />
+                  </a>
+                ))}
                 <span className="text-[0.625rem] uppercase tracking-[0.35em] text-gold">
-                  karenadventures.com
+                  @karenadventures
                 </span>
               </div>
             </motion.div>

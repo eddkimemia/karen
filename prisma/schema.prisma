@@ -149,3 +149,23 @@ model Subscriber {
   email     String   @unique
   createdAt DateTime @default(now())
 }
+
+/// A journal / blog post. Content is Markdown (rich text).
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  content     String   @db.Text // Markdown
+  image       String // Unsplash photo ID (see lib/utils img())
+  imageAlt    String
+  category    String   @default("Journal")
+  author      String   @default("Karen Adventures")
+  publishedAt DateTime @default(now())
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+  @@index([publishedAt])
+}

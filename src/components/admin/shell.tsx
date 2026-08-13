@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  BookOpenText,
   CalendarCheck2,
   ExternalLink,
   Inbox,
@@ -18,6 +19,7 @@ const NAV = [
   { href: "/admin/inquiries", label: "Inquiries", icon: Inbox },
   { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck2 },
   { href: "/admin/destinations", label: "Destinations", icon: MapPin },
+  { href: "/admin/blog", label: "Journal", icon: BookOpenText },
   { href: "/admin/subscribers", label: "Subscribers", icon: Mail },
 ];
 

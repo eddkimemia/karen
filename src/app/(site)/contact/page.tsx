@@ -163,17 +163,17 @@ export default async function ContactPage({
 
                 <div className="mt-8 flex gap-3">
                   {[
-                    { label: "Instagram", Icon: InstagramIcon, href: undefined },
-                    { label: "Facebook", Icon: FacebookIcon, href: undefined },
-                    { label: "YouTube", Icon: YoutubeIcon, href: undefined },
-                    { label: "X", Icon: XIcon, href: undefined },
+                    { label: "Instagram", Icon: InstagramIcon, href: "https://instagram.com/karenadventures" },
+                    { label: "Facebook", Icon: FacebookIcon, href: "https://facebook.com/karenadventures" },
+                    { label: "YouTube", Icon: YoutubeIcon, href: "https://youtube.com/@karenadventures" },
+                    { label: "X", Icon: XIcon, href: "https://x.com/karenadventures" },
                     { label: "WhatsApp", Icon: WhatsAppIcon, href: whatsappLink() },
                   ].map(({ label, Icon, href }) => (
                     <a
                       key={label}
-                      href={href ?? "#"}
-                      target={href?.startsWith("http") ? "_blank" : undefined}
-                      rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       aria-label={label}
                       className="flex h-10 w-10 items-center justify-center border border-midnight/15 text-midnight/60 transition-all hover:border-gold hover:text-gold hover:bg-gold hover:text-midnight"
                     >

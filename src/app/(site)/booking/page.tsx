@@ -39,12 +39,12 @@ const STEPS = [
 export default async function BookingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ adventure?: string }>;
+  searchParams: Promise<{ adventure?: string; destination?: string }>;
 }) {
   // Self-heal an empty catalog (fresh production DB) on first visit.
   await ensureCatalogSeeded();
 
-  const [{ adventure }, journeys, destinations] = await Promise.all([
+  const [{ adventure, destination }, journeys, destinations] = await Promise.all([
     searchParams,
     prisma.adventure.findMany({
       orderBy: { startingPrice: "asc" },
@@ -59,6 +59,11 @@ export default async function BookingPage({
   const preselected =
     adventure && journeys.some((j) => j.slug === adventure)
       ? adventure
+      : undefined;
+
+  const preselectedDestination =
+    destination && destinations.some((d) => d.slug === destination)
+      ? destination
       : undefined;
 
   return (
@@ -165,6 +170,7 @@ export default async function BookingPage({
                   country: d.country || "Kenya",
                 }))}
                 preselectedJourney={preselected}
+                preselectedDestination={preselectedDestination}
                 depositPercent={depositPercent()}
                 usdToKesRate={usdToKesRate()}
               />

@@ -35,7 +35,7 @@ export function Journeys({ adventures }: Props) {
                 <em className="font-serif italic text-gold">Remembering</em>
               </>
             }
-            description="Five signature experiences that define the way we travel — selected by the people who guide them."
+            description="Signature journeys from across the region — selected by the people who guide them, from the Mara to the Serengeti, Zanzibar to Lalibela."
           />
           <Reveal delay={0.15} className="shrink-0">
             <Link

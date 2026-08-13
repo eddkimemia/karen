@@ -328,7 +328,7 @@ export function MapExplorer({ destinations }: { destinations: DestinationProp[] 
 
                     <div className="mt-8 flex flex-wrap gap-4">
                       <Link
-                        href={`/contact?destination=${selected.slug}`}
+                        href={`/booking?destination=${selected.slug}`}
                         className="group inline-flex items-center gap-2.5 bg-gold px-8 py-3.5 text-[0.8125rem] font-medium uppercase tracking-[0.18em] text-midnight transition-colors hover:bg-gold-soft"
                       >
                         Plan a trip to {selected.name}
