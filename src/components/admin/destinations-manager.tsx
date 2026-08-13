@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { AdminCard, EmptyState } from "@/components/admin/ui";
+import { ImagePicker, UploadAppendButton } from "@/components/admin/image-picker";
 import { img } from "@/lib/utils";
 
 export type DestinationRow = {
@@ -114,6 +115,15 @@ export function DestinationsManager({
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
+
+  const lines = useMemo(
+    () =>
+      form.images
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    [form.images],
+  );
 
   const openCreate = () => {
     setEditing(null);
@@ -392,8 +402,21 @@ export function DestinationsManager({
               </div>
 
               <div className="sm:col-span-2">
+                <ImagePicker
+                  id="d-hero"
+                  label="Hero image"
+                  value={lines[0] ?? ""}
+                  onChange={(v) => {
+                    const rest = lines.slice(1);
+                    set("images", v ? [v, ...rest].join("\n") : rest.join("\n"));
+                  }}
+                  hint="The hero is the card & invoice photo. It is always the first image in the gallery below."
+                />
+              </div>
+
+              <div className="sm:col-span-2">
                 <label className={labelClass} htmlFor="d-images">
-                  Images (Unsplash photo IDs — one per line, first is the hero)
+                  Gallery images (one per line, first is the hero)
                 </label>
                 <textarea
                   id="d-images"
@@ -403,6 +426,20 @@ export function DestinationsManager({
                   onChange={(e) => set("images", e.target.value)}
                   placeholder={"1547471080-7cc2caa01a7e\n1516426122078-c23e76319801\n…"}
                 />
+                <div className="mt-2 flex items-center gap-3">
+                  <UploadAppendButton
+                    onUrl={(url) =>
+                      set(
+                        "images",
+                        form.images.trim()
+                          ? `${form.images.trim()}\n${url}`
+                          : url,
+                      )
+                    }
+                  >
+                    Upload &amp; add to gallery
+                  </UploadAppendButton>
+                </div>
                 {form.images.trim() && (
                   <div className="mt-3 grid grid-cols-3 gap-2">
                     {form.images
@@ -423,9 +460,6 @@ export function DestinationsManager({
                       ))}
                   </div>
                 )}
-                <p className="mt-2 text-[0.625rem] text-ivory/40">
-                  The first image is used as the card &amp; invoice hero photo.
-                </p>
               </div>
 
               <div>

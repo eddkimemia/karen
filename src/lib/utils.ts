@@ -13,8 +13,14 @@ export function formatPrice(amount: number) {
   }).format(amount);
 }
 
-/** Build an Unsplash CDN URL at a requested width with compression. */
+/**
+ * Build an image URL for a stored reference. Seed data stores Unsplash photo
+ * IDs ("1500382017468"); admin uploads store full URLs (Vercel Blob or local
+ * /uploads/...). Absolute URLs and local paths pass through untouched.
+ */
 export function img(id: string, width = 1600, quality = 80) {
+  if (!id) return "";
+  if (id.startsWith("http") || id.startsWith("/")) return id;
   return `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${width}&q=${quality}`;
 }
 

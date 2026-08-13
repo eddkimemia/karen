@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
@@ -14,11 +15,13 @@ import {
   Link2,
   List,
   ListOrdered,
+  Loader2,
   Minus,
   Quote,
   Redo2,
   Strikethrough,
   Undo2,
+  UploadCloud,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -54,14 +57,16 @@ export function RichEditor({ value, onChange, placeholder }: Props) {
     },
   });
 
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
   if (!editor) {
     return (
       <div className="min-h-[420px] animate-pulse border border-ivory/15 bg-royal-deep/60" />
     );
   }
 
-  const setLink = () => {
-    const prev = editor.getAttributes("link").href as string | undefined;
+  const setLink = () => {    const prev = editor.getAttributes("link").href as string | undefined;
     const url = window.prompt("Link URL", prev ?? "https://");
     if (url === null) return;
     if (url === "") {
@@ -83,6 +88,22 @@ export function RichEditor({ value, onChange, placeholder }: Props) {
     );
     if (url && url !== "https://") {
       editor.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
+  const uploadImage = async (file: File) => {
+    setUploading(true);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok || !data.url) throw new Error(data.error ?? "Upload failed.");
+      editor.chain().focus().setImage({ src: data.url }).run();
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : "Upload failed.");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -194,6 +215,31 @@ export function RichEditor({ value, onChange, placeholder }: Props) {
         >
           <ImagePlus className="h-4 w-4" />
         </button>
+        <button
+          type="button"
+          className={toolBtn()}
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          aria-label="Upload image"
+          title="Upload an image from your computer"
+        >
+          {uploading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <UploadCloud className="h-4 w-4" />
+          )}
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) uploadImage(file);
+            e.target.value = "";
+          }}
+        />
         <span className="ml-auto hidden text-[0.5625rem] uppercase tracking-[0.25em] text-ivory/35 sm:block">
           Rich text — formatting applies as you type
         </span>

@@ -19,6 +19,7 @@
     "@tiptap/pm": "^3.30.1",
     "@tiptap/react": "^3.30.1",
     "@tiptap/starter-kit": "^3.30.1",
+    "@vercel/blob": "^2.8.0",
     "clsx": "^2.1.1",
     "dotenv": "^16.6.1",
     "framer-motion": "^13.1.0",

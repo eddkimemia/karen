@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { RichEditor } from "@/components/admin/rich-editor";
+import { ImagePicker } from "@/components/admin/image-picker";
 import { AdminCard } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 import type { PostRow } from "@/components/admin/posts-manager";
@@ -201,17 +202,13 @@ export function PostEditor({ post }: { post: PostRow | null }) {
           </AdminCard>
 
           <AdminCard className="p-6">
-            <p className={labelClass}>Hero image (Unsplash photo ID)</p>
-            <input
-              type="text"
-              className={inputClass}
+            <ImagePicker
+              id="p-image"
+              label="Hero image"
               value={image}
-              onChange={(e) => setImage(e.target.value)}
-              placeholder="e.g. 1547471080-7cc2caa01a7e"
+              onChange={setImage}
+              hint="Upload a photo, or paste an Unsplash photo ID or image URL."
             />
-            <p className="mt-1.5 text-[0.6875rem] text-ivory/40">
-              Unsplash photo ID, e.g. from images.unsplash.com/photo-…
-            </p>
 
             <p className={cn(labelClass, "mt-5")}>Image alt text</p>
             <input
