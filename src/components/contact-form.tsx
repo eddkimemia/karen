@@ -8,7 +8,7 @@ type Option = { value: string; label: string };
 
 type Props = {
   destinations: Option[];
-  journeys: Option[];
+  journeyOptions: Option[];
   preselectedDestination?: string;
   preselectedJourney?: string;
 };
@@ -19,7 +19,7 @@ const inputClass =
 
 export function ContactForm({
   destinations,
-  journeys,
+  journeyOptions,
   preselectedDestination,
   preselectedJourney,
 }: Props) {
@@ -132,8 +132,8 @@ export function ContactForm({
             className={cn(inputClass, "appearance-none")}
           >
             <option value="">Still deciding</option>
-            {journeys.map((j) => (
-              <option key={j.value} value={j.label}>{j.label}</option>
+            {journeyOptions.map((j) => (
+              <option key={j.value} value={j.value}>{j.label}</option>
             ))}
           </select>
         </div>

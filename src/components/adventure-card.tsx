@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock } from "lucide-react";
-import { cn, formatPrice, img } from "@/lib/utils";
+import { cn, img } from "@/lib/utils";
+import { Price } from "@/components/currency";
 
 type AdventureCardProps = {
   adventure: {
@@ -75,7 +76,7 @@ export function AdventureCard({
             <span className="text-xs text-ivory/75">
               From{" "}
               <span className="font-medium text-champagne">
-                {formatPrice(a.startingPrice)}
+                <Price usd={a.startingPrice} />
               </span>
             </span>
             <span className="ml-auto inline-flex translate-y-1 items-center gap-2 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-gold opacity-0 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100">

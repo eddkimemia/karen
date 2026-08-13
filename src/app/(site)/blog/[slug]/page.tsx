@@ -3,10 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BookOpenText } from "lucide-react";
-import ReactMarkdown from "react-markdown";
 import { prisma } from "@/lib/prisma";
 import { img } from "@/lib/utils";
 import { CtaSection } from "@/components/cta-section";
+import { BlogSidebar } from "@/components/blog-sidebar";
+import { ShareButtons } from "@/components/share-buttons";
 
 export const revalidate = 60;
 
@@ -51,24 +52,29 @@ export default async function BlogPostPage({ params }: Props) {
     <>
       {/* Article header */}
       <section className="bg-midnight pt-36 pb-16 sm:pt-44 sm:pb-20">
-        <div className="mx-auto w-full max-w-3xl px-5 sm:px-8">
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-2 text-[0.6875rem] font-medium uppercase tracking-[0.25em] text-gold transition-colors hover:text-champagne"
-          >
-            <ArrowLeft className="h-4 w-4" /> The Journal
-          </Link>
-          <p className="mt-8 flex items-center gap-3 text-[0.625rem] font-medium uppercase tracking-[0.3em] text-ivory/50">
-            <span className="bg-gold px-2.5 py-1 text-midnight">{post.category}</span>
-            <span>{fmt(post.publishedAt)}</span>
-            <span>· {post.author}</span>
-          </p>
-          <h1 className="mt-6 font-serif text-4xl font-medium leading-[1.08] text-ivory text-balance sm:text-5xl">
-            {post.title}
-          </h1>
-          <p className="mt-6 font-serif text-lg italic leading-relaxed text-champagne/80">
-            {post.excerpt}
-          </p>
+        <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
+          <div className="max-w-3xl">
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 text-[0.6875rem] font-medium uppercase tracking-[0.25em] text-gold transition-colors hover:text-champagne"
+            >
+              <ArrowLeft className="h-4 w-4" /> The Journal
+            </Link>
+            <p className="mt-8 flex flex-wrap items-center gap-3 text-[0.625rem] font-medium uppercase tracking-[0.3em] text-ivory/50">
+              <span className="bg-gold px-2.5 py-1 text-midnight">{post.category}</span>
+              <span>{fmt(post.publishedAt)}</span>
+              <span>· {post.author}</span>
+            </p>
+            <h1 className="mt-6 font-serif text-4xl font-medium leading-[1.08] text-ivory text-balance sm:text-5xl">
+              {post.title}
+            </h1>
+            <p className="mt-6 font-serif text-lg italic leading-relaxed text-champagne/80">
+              {post.excerpt}
+            </p>
+            <div className="mt-8">
+              <ShareButtons title={post.title} slug={post.slug} tone="dark" />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -88,58 +94,30 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </section>
 
-      {/* Article body */}
-      <article className="bg-ivory py-16 sm:py-24">
-        <div className="mx-auto w-full max-w-3xl px-5 sm:px-8">
-          <ReactMarkdown
-            components={{
-              h1: (p) => (
-                <h1 className="mb-6 mt-12 font-serif text-3xl font-medium text-midnight" {...p} />
-              ),
-              h2: (p) => (
-                <h2 className="mb-4 mt-12 font-serif text-2xl font-medium text-midnight" {...p} />
-              ),
-              h3: (p) => (
-                <h3 className="mb-3 mt-8 font-serif text-xl font-medium text-midnight" {...p} />
-              ),
-              p: (p) => <p className="mb-6 leading-[1.9] text-midnight/75" {...p} />,
-              strong: (p) => <strong className="font-semibold text-midnight" {...p} />,
-              em: (p) => <em className="italic text-midnight/80" {...p} />,
-              ul: (p) => (
-                <ul className="mb-6 list-disc space-y-2.5 pl-6 text-midnight/75 [&>li]:marker:text-gold" {...p} />
-              ),
-              ol: (p) => (
-                <ol className="mb-6 list-decimal space-y-2.5 pl-6 text-midnight/75 [&>li]:marker:text-gold" {...p} />
-              ),
-              li: (p) => <li className="leading-relaxed" {...p} />,
-              blockquote: (p) => (
-                <blockquote
-                  className="mb-6 border-l-2 border-gold bg-sand/60 px-6 py-4 font-serif text-lg italic leading-relaxed text-midnight/85"
-                  {...p}
-                />
-              ),
-              a: ({ href, children }) => (
-                <a
-                  href={href}
-                  target={href?.startsWith("http") ? "_blank" : undefined}
-                  rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="text-gold underline decoration-gold/40 underline-offset-4 transition-colors hover:text-midnight hover:decoration-midnight/40"
-                >
-                  {children}
-                </a>
-              ),
-            }}
-          >
-            {post.content}
-          </ReactMarkdown>
+      {/* Article body + destinations sidebar */}
+      <section className="bg-ivory py-16 sm:py-24">
+        <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
+          <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <article
+              className="blog-article mx-auto w-full max-w-3xl"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
 
-          <div className="mt-16 border-t border-midnight/10 pt-8">
-            <p className="flex items-center gap-2 text-[0.6875rem] font-medium uppercase tracking-[0.3em] text-midnight/50">
-              <BookOpenText className="h-4 w-4" /> Written by {post.author} · Karen Adventures
-            </p>
+            <div className="lg:sticky lg:top-24 lg:self-start">
+              <BlogSidebar />
+            </div>
+          </div>
+
+          <div className="mx-auto mt-16 w-full max-w-3xl border-t border-midnight/10 pt-8">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <p className="flex items-center gap-2 text-[0.6875rem] font-medium uppercase tracking-[0.3em] text-midnight/50">
+                <BookOpenText className="h-4 w-4" /> Written by {post.author} · Karen Adventures
+              </p>
+              <ShareButtons title={post.title} slug={post.slug} />
+            </div>
           </div>
         </div>
-      </article>
+      </section>
 
       {/* Related */}
       {related.length > 0 && (

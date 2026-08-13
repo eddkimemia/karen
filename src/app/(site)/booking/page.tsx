@@ -7,7 +7,7 @@ import { Reveal } from "@/components/reveal";
 import { PageHeader } from "@/components/page-header";
 import { BookingForm } from "@/components/booking-form";
 import { WhatsAppIcon } from "@/components/whatsapp-icon";
-import { depositPercent, usdToKesRate } from "@/lib/paystack";
+import { depositPercent } from "@/lib/paystack";
 import { whatsappLink, WHATSAPP_DISPLAY } from "@/lib/site";
 
 export const revalidate = 60;
@@ -172,7 +172,6 @@ export default async function BookingPage({
                 preselectedJourney={preselected}
                 preselectedDestination={preselectedDestination}
                 depositPercent={depositPercent()}
-                usdToKesRate={usdToKesRate()}
               />
             </Reveal>
           </div>

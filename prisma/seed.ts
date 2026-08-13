@@ -6,6 +6,7 @@
  * Run with:  npx prisma db seed
  */
 import { PrismaClient } from "@prisma/client";
+import { marked } from "marked";
 
 // On Vercel the DB URL arrives as Vercel Postgres vars (POSTGRES_PRISMA_URL /
 // POSTGRES_URL_NON_POOLING / POSTGRES_URL) rather than DATABASE_URL. Map them
@@ -3425,10 +3426,11 @@ async function seedWith(prisma: PrismaClient) {
   // Journal / blog posts (20 signature articles, Markdown content)
   for (const b of blogPosts) {
     const { slug, publishedAt, ...data } = b;
+    const html = { ...data, content: marked.parse(data.content) as string };
     await prisma.blogPost.upsert({
       where: { slug },
-      update: { ...data, publishedAt: new Date(publishedAt), updatedAt: new Date() },
-      create: { slug, ...data, publishedAt: new Date(publishedAt) },
+      update: { ...html, publishedAt: new Date(publishedAt), updatedAt: new Date() },
+      create: { slug, ...html, publishedAt: new Date(publishedAt) },
     });
   }
   console.log(`✓ ${blogPosts.length} blog posts`);

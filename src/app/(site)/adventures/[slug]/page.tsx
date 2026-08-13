@@ -10,7 +10,8 @@ import {
   Users,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { cn, formatPrice, img } from "@/lib/utils";
+import { cn, img } from "@/lib/utils";
+import { PricePair } from "@/components/currency";
 import { Reveal } from "@/components/reveal";
 import { AdventureCard } from "@/components/adventure-card";
 import { CtaSection } from "@/components/cta-section";
@@ -206,7 +207,10 @@ export default async function AdventurePage({
                   From
                 </p>
                 <p className="mt-2 font-serif text-5xl font-medium text-midnight">
-                  {formatPrice(adventure.startingPrice)}
+                  <PricePair
+                    usd={adventure.startingPrice}
+                    secondaryClassName="text-base font-sans text-midnight/50"
+                  />
                   <span className="text-base font-sans text-midnight/50">
                     {" "}
                     / person

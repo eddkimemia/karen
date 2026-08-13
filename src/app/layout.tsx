@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
+import { CurrencyProvider } from "@/components/currency";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -103,7 +104,7 @@ export default function RootLayout({
       className={`${cormorant.variable} ${cormorantItalic.variable} ${inter.variable}`}
     >
       <body className="min-h-screen bg-midnight font-sans text-ivory">
-        {children}
+        <CurrencyProvider>{children}</CurrencyProvider>
       </body>
     </html>
   );

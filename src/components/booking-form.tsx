@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn, formatPrice } from "@/lib/utils";
+import { useCurrency, PricePair } from "@/components/currency";
 import { WhatsAppIcon } from "@/components/whatsapp-icon";
 import { whatsappLink } from "@/lib/site";
 
@@ -42,7 +43,6 @@ type Props = {
   preselectedJourney?: string;
   preselectedDestination?: string;
   depositPercent: number;
-  usdToKesRate: number;
 };
 
 const inputClass =
@@ -54,8 +54,8 @@ export function BookingForm({
   preselectedJourney,
   preselectedDestination,
   depositPercent,
-  usdToKesRate,
 }: Props) {
+  const { currency, usdToKes } = useCurrency();
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">(
     "idle",
   );
@@ -154,7 +154,11 @@ export function BookingForm({
 
   const estimateUsd = selected ? selected.price * travelers : 0;
   const depositUsd = Math.round(estimateUsd * (depositPercent / 100));
-  const depositKes = Math.round(depositUsd * usdToKesRate);
+
+  const fmtJourneyPrice = (usd: number) =>
+    currency === "KES"
+      ? `KES ${Math.round(usd * usdToKes).toLocaleString("en-KE")}`
+      : formatPrice(usd);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -250,7 +254,7 @@ export function BookingForm({
             <option value="">Custom journey — design it with us</option>
             {journeys.map((j) => (
               <option key={j.value} value={j.value}>
-                {j.label} · {formatPrice(j.price)} / person
+                {j.label} · {fmtJourneyPrice(j.price)} / person
               </option>
             ))}
           </select>
@@ -604,13 +608,13 @@ export function BookingForm({
               Estimated journey total
             </p>
             <p className="mt-1 font-serif text-3xl font-medium text-midnight">
-              {estimateUsd > 0 ? formatPrice(estimateUsd) : "To be designed"}
-              {estimateUsd > 0 && (
-                <span className="text-sm font-sans text-midnight/50">
-                  {" "}
-                  ≈ KES{" "}
-                  {Math.round(estimateUsd * usdToKesRate).toLocaleString("en-KE")}
-                </span>
+              {estimateUsd > 0 ? (
+                <PricePair
+                  usd={estimateUsd}
+                  secondaryClassName="text-sm font-sans text-midnight/50"
+                />
+              ) : (
+                "To be designed"
               )}
             </p>
           </div>
@@ -620,12 +624,10 @@ export function BookingForm({
             </p>
             <p className="mt-1 text-sm font-medium text-midnight">
               {depositUsd > 0 ? (
-                <>
-                  {formatPrice(depositUsd)}{" "}
-                  <span className="text-midnight/55">
-                    (KES {depositKes.toLocaleString("en-KE")})
-                  </span>
-                </>
+                <PricePair
+                  usd={depositUsd}
+                  secondaryClassName="text-midnight/55"
+                />
               ) : (
                 "Confirmed after design"
               )}

@@ -56,7 +56,7 @@ export default async function ContactPage({
     searchParams,
     prisma.destination.findMany({
       orderBy: { name: "asc" },
-      select: { slug: true, name: true },
+      select: { slug: true, name: true, country: true },
     }),
     prisma.adventure.findMany({
       orderBy: { startingPrice: "asc" },
@@ -67,6 +67,22 @@ export default async function ContactPage({
   const preselectedJourney = adventure
     ? journeys.find((j) => j.slug === adventure)?.title
     : undefined;
+
+  // Journey of interest draws from EVERY destination and every journey — the
+  // lists are randomized in the DB query so each visitor sees a fresh order.
+  const [journeyRows, destinationRows] = await Promise.all([
+    prisma.$queryRaw<{ title: string }[]>`SELECT title FROM "Adventure" ORDER BY random()`,
+    prisma.$queryRaw<
+      { name: string; country: string }[]
+    >`SELECT name, country FROM "Destination" ORDER BY random()`,
+  ]);
+  const journeyOptions = [
+    ...journeyRows.map((o) => ({ value: o.title, label: o.title })),
+    ...destinationRows.map((o) => ({
+      value: o.name,
+      label: `${o.name} — ${o.country}`,
+    })),
+  ];
 
   return (
     <>
@@ -187,8 +203,11 @@ export default async function ContactPage({
             {/* Form column */}
             <Reveal delay={0.1} className="lg:col-span-3">
               <ContactForm
-                destinations={destinations.map((d) => ({ value: d.name, label: d.name }))}
-                journeys={journeys.map((j) => ({ value: j.slug, label: j.title }))}
+                destinations={destinations.map((d) => ({
+                  value: d.name,
+                  label: `${d.name} — ${d.country}`,
+                }))}
+                journeyOptions={journeyOptions}
                 preselectedDestination={
                   destination
                     ? destinations.find((d) => d.slug === destination)?.name
