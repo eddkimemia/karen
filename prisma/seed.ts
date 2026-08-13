@@ -3325,12 +3325,22 @@ async function seedWith(prisma: PrismaClient) {
   // so admin edits on seeded rows survive redeploys. Force a full re-seed with:
   //   SEED_FORCE=true npx prisma db seed
   const seedSlugs = destinations.map((d) => d.slug);
-  const present = await prisma.destination.count({
-    where: { slug: { in: seedSlugs } },
-  });
-  if (present === seedSlugs.length && process.env.SEED_FORCE !== "true") {
+  const postSlugs = blogPosts.map((p) => p.slug);
+  const [present, presentPosts] = await Promise.all([
+    prisma.destination.count({
+      where: { slug: { in: seedSlugs } },
+    }),
+    prisma.blogPost.count({
+      where: { slug: { in: postSlugs } },
+    }),
+  ]);
+  if (
+    present === seedSlugs.length &&
+    presentPosts === postSlugs.length &&
+    process.env.SEED_FORCE !== "true"
+  ) {
     console.log(
-      `✓ All ${seedSlugs.length} seed destinations already present — skipping seed (set SEED_FORCE=true to re-seed).`,
+      `✓ All ${seedSlugs.length} seed destinations and ${postSlugs.length} blog posts already present — skipping seed (set SEED_FORCE=true to re-seed).`,
     );
     return { seeded: false, reason: "already-present" };
   }
