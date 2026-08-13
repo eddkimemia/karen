@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BookOpenText } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { ensureCatalogSeeded } from "@/lib/self-seed";
 import { img } from "@/lib/utils";
 import { CtaSection } from "@/components/cta-section";
 import { BlogSidebar } from "@/components/blog-sidebar";
@@ -37,6 +38,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPostPage({ params }: Props) {
+  // Self-heal an empty catalog (fresh production DB) on first visit.
+  await ensureCatalogSeeded();
+
   const { slug } = await params;
   const post = await prisma.blogPost.findUnique({ where: { slug } });
   if (!post || !post.published) notFound();

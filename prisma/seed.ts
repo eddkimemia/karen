@@ -570,7 +570,7 @@ type SeedBlogPost = {
   publishedAt: string; // ISO date
 };
 
-const blogPosts: SeedBlogPost[] = [
+export const blogPosts: SeedBlogPost[] = [
   {
     slug: "maasai-mara-best-time-to-visit",
     title: "The Best Time to Visit the Maasai Mara",

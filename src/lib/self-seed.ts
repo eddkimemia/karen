@@ -21,10 +21,21 @@ export async function ensureCatalogSeeded(): Promise<void> {
           const seedSlugs = m.destinations.map(
             (d: { slug: string }) => d.slug,
           );
-          const present = await prisma.destination.count({
-            where: { slug: { in: seedSlugs } },
-          });
-          if (present < seedSlugs.length) {
+          const postSlugs = m.blogPosts.map(
+            (p: { slug: string }) => p.slug,
+          );
+          const [presentDestinations, presentPosts] = await Promise.all([
+            prisma.destination.count({
+              where: { slug: { in: seedSlugs } },
+            }),
+            prisma.blogPost.count({
+              where: { slug: { in: postSlugs } },
+            }),
+          ]);
+          if (
+            presentDestinations < seedSlugs.length ||
+            presentPosts < postSlugs.length
+          ) {
             await m.runSeed();
           }
         })
