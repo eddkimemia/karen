@@ -20,7 +20,7 @@ export default async function Home() {
       prisma.adventure.findMany({
         where: { featured: true },
         orderBy: { startingPrice: "asc" },
-        take: 6,
+        take: 11,
       }),
       prisma.experience.findMany({ orderBy: { order: "asc" } }),
       prisma.destination.findMany({
