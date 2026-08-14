@@ -74,15 +74,18 @@ export async function POST(req: Request) {
     await writeFile(path.join(dir, name), bytes);
     return NextResponse.json({ ok: true, url: `/uploads/${name}` });
   } catch (err) {
-    console.error("[upload] Failed to store image:", err);
-    return NextResponse.json(
-      {
-        error:
-          process.env.BLOB_READ_WRITE_TOKEN
-            ? "Upload failed — check the Blob storage configuration."
-            : "Upload failed — this environment can only store images locally.",
-      },
-      { status: 500 },
-    );
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("[upload] Failed to store image:", detail);
+    let message: string;
+    if (/private store/i.test(detail)) {
+      message =
+        "Your Blob store is set to private. Open Vercel → Storage → your Blob store → Settings → Access, switch it to Public, then try again.";
+    } else if (process.env.BLOB_READ_WRITE_TOKEN) {
+      message = `Upload failed: ${detail}`;
+    } else {
+      message =
+        "Blob storage is not configured — add BLOB_READ_WRITE_TOKEN to the Vercel environment, or use a link instead.";
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
